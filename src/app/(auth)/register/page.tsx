@@ -5,17 +5,11 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { AuthService } from "@/services/AuthService";
-import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 function RegisterForm() {
   const { setAuth, token, role: storedRole } = useAuthStore();
-  const searchParams = useSearchParams();
-  const initialRole = searchParams.get("role") as "volunteer" | "lembaga" | null;
-  
-  const [role, setRole] = useState<"volunteer" | "lembaga">(initialRole || "volunteer");
   const [name, setName] = useState("");
-  const [institutionName, setInstitutionName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,58 +18,33 @@ function RegisterForm() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const router = useRouter();
 
+  // Kalau sudah login, langsung redirect
   useEffect(() => {
-    if (token) {
+    if (token && storedRole) {
       router.push(storedRole === "volunteer" ? "/dashboard/relawan" : "/dashboard/pelapor");
     }
   }, [token, storedRole, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setFieldErrors({ confirm_password: ["Password tidak cocok"] });
+      return;
+    }
     setLoading(true);
     setError("");
     setFieldErrors({});
     try {
-      let response;
-      if (role === "volunteer") {
-        response = await AuthService.registerVolunteer({
-          name,
-          email,
-          password,
-          confirm_password: confirmPassword,
-          role: "volunteer"
-        });
-      } else {
-        response = await AuthService.registerLembaga({
-          institution_name: institutionName,
-          email,
-          password,
-          confirm_password: confirmPassword,
-          role: "lembaga"
-        });
-      }
-
+      const response = await AuthService.register({ name, email, password, confirm_password: confirmPassword });
       if (response.success) {
-        // Backend uses cookies, so we set a placeholder token to mark as logged in
-        const authToken = response.data.token || 'session';
-        const userData = {
-          id: response.data.user?.id || "",
-          email: response.data.user?.email || email,
-          name: response.data.user?.name || name,
-          institution_name: response.data.user?.institution_name || institutionName
-        };
-
-        setAuth(authToken, response.data.role, userData);
-        
-        // Redirect to dashboard based on role or backend response
-        const targetPath = response.data.redirect_url || (role === "volunteer" ? "/dashboard/relawan" : "/dashboard/pelapor");
-        router.push(targetPath);
+        setAuth(response.data.token, response.data.role, response.data.user);
+        // Role null → belum pilih role → arahkan ke /pilih-role
+        router.push(response.data.role ? (response.data.role === "volunteer" ? "/dashboard/relawan" : "/dashboard/pelapor") : "/pilih-role");
       }
-    } catch (err: any) {
-      if (err.response?.data?.errors) {
-        setFieldErrors(err.response.data.errors);
-      }
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } };
+      if (e.response?.data?.errors) setFieldErrors(e.response.data.errors);
+      setError(e.response?.data?.message || "Registrasi gagal. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }
@@ -89,9 +58,10 @@ function RegisterForm() {
           <p className="text-gray-500">Create an account to start contributing</p>
         </div>
 
+        {/* Tab toggle */}
         <div className="flex bg-gray-100 rounded-2xl p-1 mb-8">
-          <Link 
-            href="/login" 
+          <Link
+            href="/login"
             className="flex-1 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:text-gray-700 text-center transition-all"
           >
             Login
@@ -108,58 +78,26 @@ function RegisterForm() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-3">
-            <label className="text-sm font-semibold text-gray-700 ml-1">Register as</label>
-            <div className="flex gap-6 p-1">
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  type="radio"
-                  name="role"
-                  value="volunteer"
-                  checked={role === "volunteer"}
-                  onChange={() => setRole("volunteer")}
-                  className="w-5 h-5 text-primary-normal border-gray-300 focus:ring-primary-normal"
-                />
-                <span className="text-sm font-medium text-gray-600 group-hover:text-black transition-colors">Relawan</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  type="radio"
-                  name="role"
-                  value="lembaga"
-                  checked={role === "lembaga"}
-                  onChange={() => setRole("lembaga")}
-                  className="w-5 h-5 text-primary-normal border-gray-300 focus:ring-primary-normal"
-                />
-                <span className="text-sm font-medium text-gray-600 group-hover:text-black transition-colors">Lembaga</span>
-              </label>
-            </div>
-          </div>
-
+          {/* Full Name */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700 ml-1">
-              {role === "volunteer" ? "Full Name" : "Institution Name"}
-            </label>
+            <label className="text-sm font-semibold text-gray-700 ml-1">Full Name</label>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Image src={role === "volunteer" ? "/icons/user.svg" : "/icons/organization.png"} alt="Icon" width={20} height={20} className="opacity-40 group-focus-within:opacity-100 transition-opacity" />
+                <Image src="/icons/user.svg" alt="User" width={20} height={20} className="opacity-40 group-focus-within:opacity-100 transition-opacity" />
               </div>
               <input
                 type="text"
                 required
-                value={role === "volunteer" ? name : institutionName}
-                onChange={(e) => role === "volunteer" ? setName(e.target.value) : setInstitutionName(e.target.value)}
-                placeholder={role === "volunteer" ? "John Doe" : "Yayasan Kemanusiaan"}
-                className={`w-full pl-11 pr-4 py-3 bg-gray-50 border rounded-2xl focus:bg-white focus:ring-2 focus:ring-primary-normal focus:border-transparent outline-none transition-all ${
-                  (role === "volunteer" ? fieldErrors.name : fieldErrors.institution_name) ? "border-red-500" : "border-gray-200"
-                }`}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="John Doe"
+                className={`w-full pl-11 pr-4 py-3 bg-gray-50 border rounded-2xl focus:bg-white focus:ring-2 focus:ring-primary-normal focus:border-transparent outline-none transition-all ${fieldErrors.name ? "border-red-500" : "border-gray-200"}`}
               />
             </div>
-            {(role === "volunteer" ? fieldErrors.name : fieldErrors.institution_name) && (
-              <p className="text-red-500 text-xs mt-1 ml-1">{(role === "volunteer" ? fieldErrors.name : fieldErrors.institution_name)![0]}</p>
-            )}
+            {fieldErrors.name && <p className="text-red-500 text-xs mt-1 ml-1">{fieldErrors.name[0]}</p>}
           </div>
 
+          {/* Email */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 ml-1">Email</label>
             <div className="relative group">
@@ -172,14 +110,13 @@ function RegisterForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="example@email.com"
-                className={`w-full pl-11 pr-4 py-3 bg-gray-50 border rounded-2xl focus:bg-white focus:ring-2 focus:ring-primary-normal focus:border-transparent outline-none transition-all ${
-                  fieldErrors.email ? "border-red-500" : "border-gray-200"
-                }`}
+                className={`w-full pl-11 pr-4 py-3 bg-gray-50 border rounded-2xl focus:bg-white focus:ring-2 focus:ring-primary-normal focus:border-transparent outline-none transition-all ${fieldErrors.email ? "border-red-500" : "border-gray-200"}`}
               />
             </div>
             {fieldErrors.email && <p className="text-red-500 text-xs mt-1 ml-1">{fieldErrors.email[0]}</p>}
           </div>
 
+          {/* Password + Confirm */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700 ml-1">Password</label>
@@ -189,9 +126,7 @@ function RegisterForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Min. 8 characters"
-                className={`w-full px-4 py-3 bg-gray-50 border rounded-2xl focus:bg-white focus:ring-2 focus:ring-primary-normal focus:border-transparent outline-none transition-all ${
-                  fieldErrors.password ? "border-red-500" : "border-gray-200"
-                }`}
+                className={`w-full px-4 py-3 bg-gray-50 border rounded-2xl focus:bg-white focus:ring-2 focus:ring-primary-normal focus:border-transparent outline-none transition-all ${fieldErrors.password ? "border-red-500" : "border-gray-200"}`}
               />
               {fieldErrors.password && <p className="text-red-500 text-xs mt-1 ml-1">{fieldErrors.password[0]}</p>}
             </div>
@@ -203,9 +138,7 @@ function RegisterForm() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className={`w-full px-4 py-3 bg-gray-50 border rounded-2xl focus:bg-white focus:ring-2 focus:ring-primary-normal focus:border-transparent outline-none transition-all ${
-                  fieldErrors.confirm_password ? "border-red-500" : "border-gray-200"
-                }`}
+                className={`w-full px-4 py-3 bg-gray-50 border rounded-2xl focus:bg-white focus:ring-2 focus:ring-primary-normal focus:border-transparent outline-none transition-all ${fieldErrors.confirm_password ? "border-red-500" : "border-gray-200"}`}
               />
               {fieldErrors.confirm_password && <p className="text-red-500 text-xs mt-1 ml-1">{fieldErrors.confirm_password[0]}</p>}
             </div>
@@ -220,6 +153,19 @@ function RegisterForm() {
           </button>
         </form>
 
+        <div className="mt-8 flex items-center gap-4">
+          <div className="flex-1 h-px bg-gray-200" />
+          <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">Or Sign Up With</span>
+          <div className="flex-1 h-px bg-gray-200" />
+        </div>
+
+        <div className="mt-6">
+          <button className="w-full flex items-center justify-center gap-4 py-3.5 border border-gray-200 rounded-2xl hover:bg-gray-50 hover:border-gray-300 transition-all font-semibold text-gray-700 group">
+            <Image src="/icons/google-icon.svg" alt="Google" width={24} height={24} className="group-hover:scale-110 transition-transform" />
+            Continue with Google
+          </button>
+        </div>
+
         <p className="mt-8 text-center text-gray-500 text-sm">
           Already have an account?{" "}
           <Link href="/login" className="text-primary-normal font-bold hover:underline">
@@ -233,7 +179,7 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-primary-normal border-t-transparent rounded-full animate-spin" /></div>}>
       <RegisterForm />
     </Suspense>
   );

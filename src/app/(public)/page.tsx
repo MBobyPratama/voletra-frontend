@@ -2,20 +2,17 @@
 
 import Hero from "@/components/organism/Hero";
 import AuthModal from "../../components/organism/AuthModal";
-import MissionSection from "@/components/organism/PublicMissionSection";
+import MissionSection from "@/components/organism/MissionSection";
 import dynamic from "next/dynamic";
 
-const MapWrapper = dynamic(
-  () => import("@/components/molecules/MapWrapper"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-[500px] bg-gray-100 rounded-2xl flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary-normal border-t-transparent rounded-full animate-spin" />
-      </div>
-    ),
-  }
-);
+const MapWrapper = dynamic(() => import("@/components/molecules/MapWrapper"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[500px] bg-gray-100 rounded-2xl flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-primary-normal border-t-transparent rounded-full animate-spin" />
+    </div>
+  ),
+});
 
 export default function Home() {
   return (

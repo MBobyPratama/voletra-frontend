@@ -7,7 +7,8 @@ import { AuthService } from "@/services/AuthService";
 import { getErrorMessage, getFieldErrors } from "@/lib/error";
 
 export default function AuthModal() {
-  const { setAuth, redirectTo, clearRedirectTo, isModalOpen, closeModal } = useAuthStore();
+  const { setAuth, redirectTo, clearRedirectTo, isModalOpen, closeModal } =
+    useAuthStore();
   const [tab, setTab] = useState<"login" | "signup">("login");
 
   // shared
@@ -41,7 +42,14 @@ export default function AuthModal() {
     setLoading(true);
     setError("");
     try {
-      const response = await AuthService.login({ email, password });
+      // Kalau BE pakai satu endpoint register:
+      const response = await AuthService.register({
+        email,
+        password,
+        confirm_password: confirmPassword,
+        name,
+      });
+
       if (response.success) {
         setAuth(response.data.token, response.data.role, response.data.user);
         closeModal();
@@ -51,12 +59,20 @@ export default function AuthModal() {
           router.push(redirectTo);
           clearRedirectTo();
         } else {
-          router.push(response.data.role === "volunteer" ? "/dashboard/relawan" : "/dashboard/pelapor");
+          router.push(
+            response.data.role
+              ? response.data.role === "volunteer"
+                ? "/dashboard/relawan"
+                : "/dashboard/pelapor"
+              : "/pilih-role"
+          );
         }
       }
     } catch (err: unknown) {
       setFieldErrors(getFieldErrors(err));
-      setError(getErrorMessage(err, "Login gagal. Periksa kembali kredensial Anda."));
+      setError(
+        getErrorMessage(err, "Login gagal. Periksa kembali kredensial Anda.")
+      );
     } finally {
       setLoading(false);
     }
@@ -67,7 +83,12 @@ export default function AuthModal() {
     setError("");
     setFieldErrors({});
     try {
-      const response = await AuthService.register({ email, password, confirm_password: confirmPassword, name });
+      const response = await AuthService.register({
+        email,
+        password,
+        confirm_password: confirmPassword,
+        name,
+      });
       if (response.success) {
         setAuth(response.data.token, response.data.role, response.data.user);
         closeModal();
@@ -113,7 +134,9 @@ export default function AuthModal() {
             <button
               onClick={() => handleTabChange("login")}
               className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
-                tab === "login" ? "bg-primary-normal text-white" : "text-primary-normal bg-white"
+                tab === "login"
+                  ? "bg-primary-normal text-white"
+                  : "text-primary-normal bg-white"
               }`}
             >
               Login
@@ -121,7 +144,9 @@ export default function AuthModal() {
             <button
               onClick={() => handleTabChange("signup")}
               className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
-                tab === "signup" ? "bg-primary-normal text-white" : "text-primary-normal bg-white"
+                tab === "signup"
+                  ? "bg-primary-normal text-white"
+                  : "text-primary-normal bg-white"
               }`}
             >
               Sign Up
@@ -138,9 +163,20 @@ export default function AuthModal() {
             <>
               <div className="flex flex-col gap-3 mb-4">
                 <div>
-                  <label className="text-sm text-gray-600 mb-1 block">Email</label>
-                  <div className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${fieldErrors.email ? "border-red-400" : "border-gray-200"}`}>
-                    <Image src="/icons/mail.svg" alt="mail" width={20} height={20} />
+                  <label className="text-sm text-gray-600 mb-1 block">
+                    Email
+                  </label>
+                  <div
+                    className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${
+                      fieldErrors.email ? "border-red-400" : "border-gray-200"
+                    }`}
+                  >
+                    <Image
+                      src="/icons/mail.svg"
+                      alt="mail"
+                      width={20}
+                      height={20}
+                    />
                     <input
                       type="email"
                       value={email}
@@ -149,12 +185,29 @@ export default function AuthModal() {
                       placeholder="example@gmail.com"
                     />
                   </div>
-                  {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email[0]}</p>}
+                  {fieldErrors.email && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {fieldErrors.email[0]}
+                    </p>
+                  )}
                 </div>
                 <div>
-                  <label className="text-sm text-gray-600 mb-1 block">Password</label>
-                  <div className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${fieldErrors.password ? "border-red-400" : "border-gray-200"}`}>
-                    <Image src="/icons/lock.svg" alt="lock" width={20} height={20} />
+                  <label className="text-sm text-gray-600 mb-1 block">
+                    Password
+                  </label>
+                  <div
+                    className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${
+                      fieldErrors.password
+                        ? "border-red-400"
+                        : "border-gray-200"
+                    }`}
+                  >
+                    <Image
+                      src="/icons/lock.svg"
+                      alt="lock"
+                      width={20}
+                      height={20}
+                    />
                     <input
                       type="password"
                       value={password}
@@ -163,7 +216,11 @@ export default function AuthModal() {
                       placeholder="••••••••"
                     />
                   </div>
-                  {fieldErrors.password && <p className="text-red-500 text-xs mt-1">{fieldErrors.password[0]}</p>}
+                  {fieldErrors.password && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {fieldErrors.password[0]}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -182,7 +239,12 @@ export default function AuthModal() {
               </div>
 
               <button className="w-full border border-gray-200 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                <Image src="/icons/google-icon.svg" alt="Google" width={20} height={20} />
+                <Image
+                  src="/icons/google-icon.svg"
+                  alt="Google"
+                  width={20}
+                  height={20}
+                />
                 Continue with Google
               </button>
             </>
@@ -190,8 +252,14 @@ export default function AuthModal() {
             <>
               <div className="flex flex-col gap-3 mb-4">
                 <div>
-                  <label className="text-sm text-gray-600 mb-1 block">Full Name</label>
-                  <div className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${fieldErrors.name ? "border-red-400" : "border-gray-200"}`}>
+                  <label className="text-sm text-gray-600 mb-1 block">
+                    Full Name
+                  </label>
+                  <div
+                    className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${
+                      fieldErrors.name ? "border-red-400" : "border-gray-200"
+                    }`}
+                  >
                     <input
                       type="text"
                       value={name}
@@ -200,12 +268,27 @@ export default function AuthModal() {
                       placeholder="John Doe"
                     />
                   </div>
-                  {fieldErrors.name && <p className="text-red-500 text-xs mt-1">{fieldErrors.name[0]}</p>}
+                  {fieldErrors.name && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {fieldErrors.name[0]}
+                    </p>
+                  )}
                 </div>
                 <div>
-                  <label className="text-sm text-gray-600 mb-1 block">Email</label>
-                  <div className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${fieldErrors.email ? "border-red-400" : "border-gray-200"}`}>
-                    <Image src="/icons/mail.svg" alt="mail" width={20} height={20} />
+                  <label className="text-sm text-gray-600 mb-1 block">
+                    Email
+                  </label>
+                  <div
+                    className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${
+                      fieldErrors.email ? "border-red-400" : "border-gray-200"
+                    }`}
+                  >
+                    <Image
+                      src="/icons/mail.svg"
+                      alt="mail"
+                      width={20}
+                      height={20}
+                    />
                     <input
                       type="email"
                       value={email}
@@ -214,12 +297,29 @@ export default function AuthModal() {
                       placeholder="example@gmail.com"
                     />
                   </div>
-                  {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email[0]}</p>}
+                  {fieldErrors.email && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {fieldErrors.email[0]}
+                    </p>
+                  )}
                 </div>
                 <div>
-                  <label className="text-sm text-gray-600 mb-1 block">Password</label>
-                  <div className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${fieldErrors.password ? "border-red-400" : "border-gray-200"}`}>
-                    <Image src="/icons/lock.svg" alt="lock" width={20} height={20} />
+                  <label className="text-sm text-gray-600 mb-1 block">
+                    Password
+                  </label>
+                  <div
+                    className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${
+                      fieldErrors.password
+                        ? "border-red-400"
+                        : "border-gray-200"
+                    }`}
+                  >
+                    <Image
+                      src="/icons/lock.svg"
+                      alt="lock"
+                      width={20}
+                      height={20}
+                    />
                     <input
                       type="password"
                       value={password}
@@ -228,12 +328,29 @@ export default function AuthModal() {
                       placeholder="••••••••"
                     />
                   </div>
-                  {fieldErrors.password && <p className="text-red-500 text-xs mt-1">{fieldErrors.password[0]}</p>}
+                  {fieldErrors.password && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {fieldErrors.password[0]}
+                    </p>
+                  )}
                 </div>
                 <div>
-                  <label className="text-sm text-gray-600 mb-1 block">Confirm Password</label>
-                  <div className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${fieldErrors.confirm_password ? "border-red-400" : "border-gray-200"}`}>
-                    <Image src="/icons/lock.svg" alt="lock" width={20} height={20} />
+                  <label className="text-sm text-gray-600 mb-1 block">
+                    Confirm Password
+                  </label>
+                  <div
+                    className={`border rounded-lg px-3 py-2 flex items-center gap-2 ${
+                      fieldErrors.confirm_password
+                        ? "border-red-400"
+                        : "border-gray-200"
+                    }`}
+                  >
+                    <Image
+                      src="/icons/lock.svg"
+                      alt="lock"
+                      width={20}
+                      height={20}
+                    />
                     <input
                       type="password"
                       value={confirmPassword}
@@ -242,7 +359,11 @@ export default function AuthModal() {
                       placeholder="••••••••"
                     />
                   </div>
-                  {fieldErrors.confirm_password && <p className="text-red-500 text-xs mt-1">{fieldErrors.confirm_password[0]}</p>}
+                  {fieldErrors.confirm_password && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {fieldErrors.confirm_password[0]}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -261,7 +382,12 @@ export default function AuthModal() {
               </div>
 
               <button className="w-full border border-gray-200 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                <Image src="/icons/google-icon.svg" alt="Google" width={20} height={20} />
+                <Image
+                  src="/icons/google-icon.svg"
+                  alt="Google"
+                  width={20}
+                  height={20}
+                />
                 Continue with Google
               </button>
             </>

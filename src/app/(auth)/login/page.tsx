@@ -1,21 +1,26 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/app/store/authStore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { AuthService } from "@/services/AuthService";
+import { Suspense } from "react";
 
-export default function LoginPage() {
+function LoginForm() {
   const { setAuth, token, role } = useAuthStore();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
+  // Kalau sudah login, langsung redirect
   useEffect(() => {
-    if (token) {
+    if (token && role) {
       router.push(role === "volunteer" ? "/dashboard/relawan" : "/dashboard/pelapor");
     }
   }, [token, role, router]);
@@ -28,10 +33,18 @@ export default function LoginPage() {
       const response = await AuthService.login({ email, password });
       if (response.success) {
         setAuth(response.data.token, response.data.role, response.data.user);
-        router.push(response.data.role === "volunteer" ? "/dashboard/relawan" : "/dashboard/pelapor");
+
+        if (redirect) {
+          router.push(redirect);
+        } else if (response.data.role === "volunteer") {
+          router.push("/dashboard/relawan");
+        } else {
+          router.push("/dashboard/pelapor");
+        }
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed. Please check your credentials.");
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } } };
+      setError(e.response?.data?.message || "Login gagal. Periksa kembali email dan password.");
     } finally {
       setLoading(false);
     }
@@ -45,12 +58,13 @@ export default function LoginPage() {
           <p className="text-gray-500">Log in to your Voletra account</p>
         </div>
 
+        {/* Tab toggle */}
         <div className="flex bg-gray-100 rounded-2xl p-1 mb-8">
           <button className="flex-1 py-3 text-sm font-semibold rounded-xl bg-primary-normal text-white shadow-md">
             Login
           </button>
-          <Link 
-            href="/register" 
+          <Link
+            href="/register"
             className="flex-1 py-3 text-sm font-semibold rounded-xl text-gray-500 hover:text-gray-700 text-center transition-all"
           >
             Sign Up
@@ -108,9 +122,9 @@ export default function LoginPage() {
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
                 Processing...
               </span>
@@ -119,9 +133,9 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-10 flex items-center gap-4">
-          <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 h-px bg-gray-200" />
           <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">Or Login With</span>
-          <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 h-px bg-gray-200" />
         </div>
 
         <div className="mt-8">
@@ -139,5 +153,13 @@ export default function LoginPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-primary-normal border-t-transparent rounded-full animate-spin" /></div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
