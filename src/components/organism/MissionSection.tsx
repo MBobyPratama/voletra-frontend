@@ -9,6 +9,8 @@ import StatusBadge from "@/components/atoms/StatusBadge";
 import MissionSkeleton from "@/components/molecules/MissionSkeleton";
 import MissionFilter from "../molecules/MissionFilter";
 import MissionDetailCard from "./MissionDetailCard";
+import Sidebar from "./Sidebar";
+// import { MisiService } from "@/services/MisiService"; KALO UDAH DI SAMBUNG BE
 
 // Mapping label filter UI → nilai kategori yang dipakai backend
 const CATEGORY_MAP: Record<string, string> = {
@@ -27,11 +29,19 @@ const DUMMY_MISSIONS: Misi[] = [
   {
     id: "ms-1",
     judul: "Distribusi Bantuan Bencana",
-    deskripsi: "",
+    deskripsi:
+      "Program distribusi bantuan logistik kepada korban bencana alam di wilayah Aceh Timur. Kegiatan ini meliputi pembagian sembako, pakaian, dan perlengkapan darurat kepada masyarakat terdampak yang membutuhkan bantuan segera.",
     kategori: "Bencana Alam",
     alamat: "Torniang, Aceh Timur",
     jumlah_relawan: 100,
-    foto: [],
+    tanggal_mulai: "1 Juni 2026",
+    tanggal_selesai: "7 Juni 2026",
+    foto: [
+      "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=400",
+      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=400",
+      "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=400",
+    ],
     status: "Open" as MisiStatus,
     mode: "Offline",
     createdAt: "",
@@ -202,12 +212,9 @@ export default function MissionSection() {
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("");
   const [selectedMisi, setSelectedMisi] = useState<Misi | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    // TODO: ganti dengan fetch API backend saat sudah siap
-    // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/misi`)
-    // const data = await res.json()
-    // setMissions(data)
     setMissions(DUMMY_MISSIONS);
     setLoading(false);
   }, []);
@@ -230,9 +237,29 @@ export default function MissionSection() {
     });
   }, [missions, search, location, category]);
 
+  // ── Tampilan detail misi full-screen (menggantikan seluruh halaman dashboard) ──
+  if (selectedMisi) {
+    return (
+      <div className="fixed ml-64 inset-0 z-50 bg-[#EAF0FA] overflow-y-auto">
+        <Sidebar />
+
+        <div className="p-8">
+          <MissionDetailCard
+            misi={selectedMisi}
+            onBack={() => setSelectedMisi(null)}
+            onRegister={() => {
+              setSelectedMisi(null);
+              router.push("/dashboard/relawan/mission");
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Tampilan default daftar misi ──────────────────────────────────────────────
   return (
     <div>
-      {/* Pakai MissionFilter yang sudah diextract */}
       <MissionFilter
         search={search}
         location={location}
@@ -243,7 +270,6 @@ export default function MissionSection() {
       />
 
       {loading ? (
-        // Pakai MissionSkeleton yang sudah ada di src/components/molecules
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <MissionSkeleton key={i} />
@@ -263,29 +289,6 @@ export default function MissionSection() {
               onApply={setSelectedMisi}
             />
           ))}
-        </div>
-      )}
-
-      {selectedMisi && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-6">
-          <div className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto">
-            {/* tombol close */}
-            <button
-              onClick={() => setSelectedMisi(null)}
-              className="absolute right-4 top-4 z-10 text-2xl text-gray-500 hover:text-black"
-            >
-              ×
-            </button>
-
-            <MissionDetailCard
-              misi={selectedMisi}
-              onBack={() => setSelectedMisi(null)}
-              onRegister={() => {
-                alert(`Berhasil daftar ke ${selectedMisi.judul}`);
-                setSelectedMisi(null);
-              }}
-            />
-          </div>
         </div>
       )}
     </div>

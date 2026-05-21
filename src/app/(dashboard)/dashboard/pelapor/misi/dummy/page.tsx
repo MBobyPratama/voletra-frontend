@@ -84,7 +84,7 @@ export default function DummyMissionDetailPage() {
 
   return (
     <div className="flex min-h-screen bg-[#EAF0FA]">
-      <Sidebar activeTab="mission" />
+      <Sidebar />
 
       <main className="flex-1 ml-64 p-8">
         {/* Header */}

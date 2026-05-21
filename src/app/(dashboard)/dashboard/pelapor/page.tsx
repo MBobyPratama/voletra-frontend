@@ -52,7 +52,7 @@ export default function PelaporDashboard() {
 
   return (
     <div className="flex min-h-screen bg-[#EAF0FA]">
-      <Sidebar activeTab="home" />
+      <Sidebar />
 
       <main className="flex-1 ml-64 p-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">

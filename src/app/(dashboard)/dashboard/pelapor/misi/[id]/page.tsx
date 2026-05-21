@@ -83,7 +83,7 @@ export default function MissionDetailPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-[#EAF0FA]">
-        <Sidebar activeTab="mission" />
+        <Sidebar />
         <main className="flex-1 ml-64 p-8">
           <div className="animate-pulse flex flex-col gap-6">
             <div className="h-[400px] bg-gray-200 rounded-[10px]"></div>
@@ -97,7 +97,7 @@ export default function MissionDetailPage() {
   if (isError || !misi) {
     return (
       <div className="flex min-h-screen bg-[#EAF0FA]">
-        <Sidebar activeTab="mission" />
+        <Sidebar />
         <main className="flex-1 ml-64 p-8 flex flex-col items-center justify-center">
           <p className="text-red-500 font-medium text-lg mb-4">Gagal memuat data misi.</p>
           <button onClick={() => router.back()} className="text-blue-600 hover:underline">
@@ -110,19 +110,8 @@ export default function MissionDetailPage() {
 
   return (
     <div className="flex min-h-screen bg-[#EAF0FA]">
-      <Sidebar activeTab="mission" />
-      
+      <Sidebar />
       <main className="flex-1 ml-64 p-8">
-        {/* Header / Back Button */}
-        <div className="mb-[24px]">
-          <button 
-            onClick={() => router.back()}
-            className="flex items-center gap-[8px] text-gray-600 hover:text-black transition-colors font-medium"
-          >
-            <FiArrowLeft className="text-[20px]" />
-            Kembali
-          </button>
-        </div>
 
         <div className="flex flex-col gap-[24px]">
           {/* Mission Detail Card */}

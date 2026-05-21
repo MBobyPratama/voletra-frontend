@@ -4,14 +4,26 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 // import Button from "@/components/atoms/Button";
 import Sidebar from "@/components/organism/Sidebar";
-// import MissionCard from "@/components/molecules/MissionCard"; 
+// import MissionCard from "@/components/molecules/MissionCard";
 // import MissionSkeleton from "@/components/molecules/MissionSkeleton";
-// import MissionDetailCard from "@/components/organism/MissionDetailCard"; Kalo BE udah siap 
+// import MissionDetailCard from "@/components/organism/MissionDetailCard"; Kalo BE udah siap
 import { MisiService } from "@/services/MisiService";
 import { Misi } from "@/types/misi";
 import { useAuthStore } from "@/app/store/authStore";
-import MapWrapper from "@/components/molecules/MapWrapper";
-import MissionSection from "@/components/organism/PublicMissionSection";
+import MissionSection from "@/components/organism/MissionSection";
+import dynamic from 'next/dynamic';
+
+const MapWrapper = dynamic(
+  () => import('@/components/molecules/MapWrapper'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-72 bg-gray-100 rounded-2xl flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary-normal border-t-transparent rounded-full animate-spin" />
+      </div>
+    ),
+  }
+);
 
 export default function RelawanDashboard() {
   const { user } = useAuthStore();

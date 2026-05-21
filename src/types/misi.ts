@@ -9,6 +9,7 @@ export interface Misi {
   longitude?: number;
   latitude?: number;
   link_contact?: string;
+  link_lokasi?: string;
   jumlah_relawan: number;
   tanggal_mulai?: string;
   tanggal_selesai?: string;
