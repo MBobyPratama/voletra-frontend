@@ -10,7 +10,7 @@ import MissionSkeleton from "@/components/molecules/MissionSkeleton";
 import MissionFilter from "../molecules/MissionFilter";
 import MissionDetailCard from "./MissionDetailCard";
 import Sidebar from "./Sidebar";
-// import { MisiService } from "@/services/MisiService"; KALO UDAH DI SAMBUNG BE
+import { MisiService } from "@/services/MisiService";
 
 // Mapping label filter UI → nilai kategori yang dipakai backend
 const CATEGORY_MAP: Record<string, string> = {
@@ -23,96 +23,6 @@ const CATEGORY_MAP: Record<string, string> = {
   Music: "Lainnya",
   "Elderly Care": "Lainnya",
 };
-
-// Data dummy dengan struktur tipe Misi — tinggal ganti dengan fetch API
-const DUMMY_MISSIONS: Misi[] = [
-  {
-    id: "ms-1",
-    judul: "Distribusi Bantuan Bencana",
-    deskripsi:
-      "Program distribusi bantuan logistik kepada korban bencana alam di wilayah Aceh Timur. Kegiatan ini meliputi pembagian sembako, pakaian, dan perlengkapan darurat kepada masyarakat terdampak yang membutuhkan bantuan segera.",
-    kategori: "Bencana Alam",
-    alamat: "Torniang, Aceh Timur",
-    jumlah_relawan: 100,
-    tanggal_mulai: "1 Juni 2026",
-    tanggal_selesai: "7 Juni 2026",
-    foto: [
-      "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=400",
-      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=400",
-      "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=400",
-    ],
-    status: "Open" as MisiStatus,
-    mode: "Offline",
-    createdAt: "",
-    updatedAt: "",
-  },
-  {
-    id: "ms-2",
-    judul: "Tanggap Banjir",
-    deskripsi: "",
-    kategori: "Bencana Alam",
-    alamat: "Tapanuli Utara, Sumatra Utara",
-    jumlah_relawan: 100,
-    foto: [],
-    status: "Open" as MisiStatus,
-    mode: "Offline",
-    createdAt: "",
-    updatedAt: "",
-  },
-  {
-    id: "ms-3",
-    judul: "Peduli Lansia",
-    deskripsi: "",
-    kategori: "Kesehatan",
-    alamat: "Jakarta Barat, DKI Jakarta",
-    jumlah_relawan: 20,
-    foto: [],
-    status: "Open" as MisiStatus,
-    mode: "Online",
-    createdAt: "",
-    updatedAt: "",
-  },
-  {
-    id: "ms-4",
-    judul: "Green Action",
-    deskripsi: "",
-    kategori: "Lingkungan",
-    alamat: "Cisarua, Jawa Barat",
-    jumlah_relawan: 50,
-    foto: [],
-    status: "Open" as MisiStatus,
-    mode: "Offline",
-    createdAt: "",
-    updatedAt: "",
-  },
-  {
-    id: "ms-5",
-    judul: "Gerakan Papua Mengajar",
-    deskripsi: "",
-    kategori: "Edukasi",
-    alamat: "Nabire, Papua Tengah",
-    jumlah_relawan: 50,
-    foto: [],
-    status: "Open" as MisiStatus,
-    mode: "Online",
-    createdAt: "",
-    updatedAt: "",
-  },
-  {
-    id: "ms-6",
-    judul: "Sehat Setara",
-    deskripsi: "",
-    kategori: "Kesehatan",
-    alamat: "Yogyakarta",
-    jumlah_relawan: 50,
-    foto: [],
-    status: "Open" as MisiStatus,
-    mode: "Online",
-    createdAt: "",
-    updatedAt: "",
-  },
-];
 
 // ─── Card khusus halaman publik ───────────────────────────────────────────────
 // MissionCard yang ada di src/components/molecules mengarah ke /dashboard,
@@ -215,9 +125,29 @@ export default function MissionSection() {
   const router = useRouter();
 
   useEffect(() => {
-    setMissions(DUMMY_MISSIONS);
-    setLoading(false);
+    const fetchMissions = async () => {
+      try {
+        const data = await MisiService.getMisi();
+        setMissions(data);
+      } catch (error) {
+        console.error("Failed to fetch missions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMissions();
   }, []);
+
+  const handleSelectMisi = async (misi: Misi) => {
+    try {
+      const fullMisi = await MisiService.getById(misi.id);
+      setSelectedMisi(fullMisi);
+    } catch (error) {
+      console.error("Failed to fetch full mission details:", error);
+      setSelectedMisi(misi);
+    }
+  };
 
   const filtered = useMemo(() => {
     return missions.filter((m) => {
@@ -286,7 +216,7 @@ export default function MissionSection() {
             <PublicMissionCard
               key={misi.id}
               misi={misi}
-              onApply={setSelectedMisi}
+              onApply={handleSelectMisi}
             />
           ))}
         </div>

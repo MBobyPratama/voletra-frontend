@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Sidebar from "@/components/organism/Sidebar";
-import StatusBadge from "@/components/atoms/StatusBadge";
 import MissionSkeleton from "@/components/molecules/MissionSkeleton";
 import MissionDetailCard from "@/components/organism/MissionDetailCard";
 import ApprovedRegistration from "@/components/organism/ApprovedRegistration";
@@ -29,66 +29,9 @@ interface AppliedMisi {
   status: string;
   link_wa?: string; // link whatsapp group dari pelapor
   link_lokasi?: string; // link maps lokasi
+  latitude?: number;
+  longitude?: number;
 }
-
-// const data = await MisiService.getById()
-const DUMMY_APPLIED: AppliedMisi[] = [
-  {
-    id: "apply-1",
-    misi_id: "ms-4",
-    judul: "Green Action",
-    alamat: "Cisarua, Jawa Barat",
-    foto: [
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=300",
-    ],
-    mode: "Offline",
-    apply_status: "Pending",
-    kategori: "Lingkungan",
-    jumlah_relawan: 50,
-    deskripsi: "Aksi penghijauan dan penanaman pohon.",
-    status: "Open",
-    tanggal_mulai: "10 Mei 2026",
-    tanggal_selesai: "10 Mei 2026",
-  },
-  {
-    id: "apply-2",
-    misi_id: "ms-2",
-    judul: "Tanggap Banjir",
-    alamat: "Tapanuli Utara, Sumatra Utara",
-    foto: ["https://images.unsplash.com/photo-1547683905-f686c993aae5?w=300"],
-    mode: "Offline",
-    apply_status: "Reject",
-    kategori: "Bencana Alam",
-    jumlah_relawan: 100,
-    deskripsi: "Aksi tanggap darurat banjir.",
-    status: "Open",
-    tanggal_mulai: "5 Mei 2026",
-    tanggal_selesai: "20 Mei 2026",
-  },
-  {
-    id: "apply-3",
-    misi_id: "ms-3",
-    judul: "Digital Mengajar",
-    alamat: "Lombok Timur, Nusa Tenggara Barat",
-    foto: [
-      "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800",
-      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400",
-      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400",
-    ],
-    mode: "Online",
-    apply_status: "Approve",
-    kategori: "Technology",
-    jumlah_relawan: 20,
-    deskripsi:
-      "Program ini untuk meningkatkan literasi dan keterampilan teknologi masyarakat, khususnya dalam membantu mereka memahami penggunaan perangkat digital secara efektif.",
-    status: "Open",
-    tanggal_mulai: "12 April 2026",
-    tanggal_selesai: "20 April 2026",
-    link_wa: "https://chat.whatsapp.com/contoh",
-    link_lokasi: "https://maps.google.com/?q=Lombok+Timur",
-  },
-];
-// ─────────────────────────────────────────────────────────────────────────────
 
 const TABS = [
   "All",
@@ -101,16 +44,16 @@ const TABS = [
 
 function ApplyStatusBadge({ status }: { status: ApplyStatus }) {
   const styles: Record<ApplyStatus, string> = {
-    Pending: "bg-[#EAF0FA] text-[#2869CA] border-[#BCD1EF]",
-    Approve: "bg-green-50 text-green-600 border-green-200",
-    Reject: "bg-yellow-50 text-yellow-600 border-yellow-200",
+    Pending: "bg-[rgba(188,209,239,0.87)] text-[#1E4F98]",
+    Approve: "bg-[#BFE5BD] text-[#258020]",
+    Reject: "bg-[#FFE1B0] text-[#BF7600]",
   };
   return (
-    <span
-      className={`px-4 py-1 rounded-full text-xs font-medium border ${styles[status]}`}
-    >
-      {status}
-    </span>
+    <div className={`flex h-[28px] items-center justify-center px-3 py-[10px] rounded-[8px] ${styles[status]}`}>
+      <span className="font-['Poppins:SemiBold',sans-serif] leading-[20px] text-[12px]">
+        {status}
+      </span>
+    </div>
   );
 }
 
@@ -121,10 +64,13 @@ function MisiRow({
   item: AppliedMisi;
   onViewDetail: (item: AppliedMisi) => void;
 }) {
-  const thumbnail = item.foto?.[0] || null;
+  const thumbnail = item.foto && item.foto.length > 0 
+    ? (item.foto[0].startsWith('http') ? item.foto[0] : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.foto[0]}`) 
+    : null;
+    
   return (
-    <div className="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-      <div className="w-20 h-20 rounded-xl overflow-hidden relative bg-gray-200 shrink-0">
+    <div className="bg-white flex items-center h-[121px] w-full border-b border-[rgba(0,0,0,0.2)]">
+      <div className="w-[102px] h-[87px] relative shrink-0 ml-[12px] rounded-[6px] overflow-hidden">
         {thumbnail ? (
           <Image
             src={thumbnail}
@@ -133,7 +79,7 @@ function MisiRow({
             className="object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-300">
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-300">
             <svg
               className="w-8 h-8"
               fill="none"
@@ -150,22 +96,32 @@ function MisiRow({
           </div>
         )}
       </div>
-      <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-gray-800 text-sm truncate mb-1">
+      <div className="flex-1 min-w-0 ml-[23px] flex flex-col justify-center h-full">
+        <p className="font-['Poppins:Medium',sans-serif] text-[16px] text-black leading-[normal] truncate mb-1">
           {item.judul}
-        </h3>
-        <p className="text-xs text-gray-500 truncate mb-2">{item.alamat}</p>
-        <div className="flex gap-2 flex-wrap">
+        </p>
+        <p className="font-['Poppins:Light',sans-serif] text-[12px] text-black leading-[normal] truncate">
+          {item.alamat}
+        </p>
+        <div className="flex gap-[13px] items-center mt-[15px]">
           <ApplyStatusBadge status={item.apply_status} />
-          <StatusBadge status={item.mode} />
+          <div className="border border-[#2869ca] flex h-[28px] items-center justify-center px-3 py-[10px] rounded-[6px]">
+             <span className="font-['Poppins:Medium',sans-serif] text-[#2869ca] text-[12px]">
+               {item.mode}
+             </span>
+          </div>
         </div>
       </div>
-      <button
-        onClick={() => onViewDetail(item)}
-        className="shrink-0 px-5 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-      >
-        View Details
-      </button>
+      <div className="shrink-0 mr-[18px]">
+        <button
+          onClick={() => onViewDetail(item)}
+          className="border border-[#2869ca] flex h-[27px] items-center justify-center px-[10px] rounded-[6px] transition-colors hover:bg-blue-50"
+        >
+          <span className="font-['Poppins:Medium',sans-serif] text-[#2869ca] text-[12px] whitespace-nowrap">
+            View Details
+          </span>
+        </button>
+      </div>
     </div>
   );
 }
@@ -181,11 +137,10 @@ export default function RelawanMisiPage() {
     const load = async () => {
       setLoading(true);
       try {
-        // TODO: [BE] ganti 2 baris ini dengan:
-        // const data = await MisiService.getAppliedByRelawan();
-        // setApplied(data);
-        await new Promise((r) => setTimeout(r, 500));
-        setApplied(DUMMY_APPLIED);
+        const data = await MisiService.getAppliedByRelawan();
+        setApplied(data);
+      } catch (error) {
+        console.error("Failed to fetch applied missions:", error);
       } finally {
         setLoading(false);
       }
@@ -298,25 +253,27 @@ export default function RelawanMisiPage() {
               misi={toMisi(selectedItem)}
               // Tidak ada onEdit — diganti dua tombol di bawah
               extraActions={
-                <div className="flex gap-3 justify-end mt-8">
+                <div className="flex gap-[14px] justify-end mt-8">
                   {selectedItem.link_lokasi && (
-                    <a
-                      href={selectedItem.link_lokasi}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-8 py-3 rounded-xl border border-primary-normal text-primary-normal font-semibold text-sm hover:bg-primary-light transition-colors"
+                    <Link
+                      href={`/dashboard/relawan/mission/${selectedItem.misi_id}/location`}
+                      className="bg-[#bcd1ef] flex items-center justify-center p-[10px] rounded-[10px] w-[293px]"
                     >
-                      Location
-                    </a>
+                      <span className="font-['Poppins:Medium',sans-serif] text-[#0e2547] text-[16px] whitespace-nowrap">
+                        Location
+                      </span>
+                    </Link>
                   )}
                   {selectedItem.link_wa && (
                     <a
                       href={selectedItem.link_wa}
                       target="_blank"
                       rel="noreferrer"
-                      className="px-8 py-3 rounded-xl bg-primary-normal text-white font-semibold text-sm hover:bg-primary-normalHover transition-colors"
+                      className="bg-[#3349c6] flex items-center justify-center p-[10px] rounded-[10px] w-[293px]"
                     >
-                      Join Whatsapp Group
+                      <span className="font-['Poppins:Medium',sans-serif] text-[#eaf0fa] text-[16px] whitespace-nowrap">
+                        Join Whatsapp Group
+                      </span>
                     </a>
                   )}
                 </div>
@@ -341,20 +298,24 @@ export default function RelawanMisiPage() {
         {/* ─── View: List misi ─── */}
         {view === "list" && (
           <>
-            <h1 className="text-2xl font-bold text-[#122F5B] mb-6">Mission</h1>
+            <h1 className="font-['Poppins:Medium',sans-serif] text-[24px] text-black mb-[25px]">Mission</h1>
 
-            <div className="flex gap-2 flex-wrap mb-6">
+            <div className="flex gap-[18px] items-center mb-[25px]">
               {TABS.map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                  className={`flex h-[28px] items-center justify-center p-[10px] rounded-[14px] transition-all min-w-[93px] ${
                     activeTab === tab
-                      ? "bg-primary-normal text-white border-primary-normal"
-                      : "bg-white text-gray-500 border-gray-200 hover:border-primary-normal hover:text-primary-normal"
+                      ? "bg-[#2869ca] border border-transparent"
+                      : "bg-[rgba(255,255,255,0.43)] border border-[rgba(0,0,0,0.2)] hover:border-[#2869ca]"
                   }`}
                 >
-                  {tab}({tabCounts[tab] ?? 0})
+                  <span className={`font-['Poppins:Regular',sans-serif] leading-[20px] text-[12px] whitespace-nowrap ${
+                    activeTab === tab ? "text-white" : "text-[rgba(0,0,0,0.54)]"
+                  }`}>
+                    {tab}({tabCounts[tab] ?? 0})
+                  </span>
                 </button>
               ))}
             </div>

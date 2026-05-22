@@ -24,11 +24,17 @@ export interface Misi {
 export interface Applicant {
   apply_id: string;
   user_id: string;
-  nama: string;
-  tanggal_lahir: string;
-  phone: string;
-  skill: string;
-  domisili: string;
+  full_name?: string; // from backend full_name
+  nama?: string; // used by some frontend components
+  birth_date?: string; // from backend birth_date
+  tanggal_lahir?: string; // used by some frontend components
+  phone_number?: string; // from backend phone_number
+  phone?: string; // used by some frontend components
+  domicile?: string; // from backend domicile
+  domisili?: string; // used by some frontend components
+  skills_url?: string;
+  skill?: string; // for skill label/title
+  video_link?: string;
   status: 'pending' | 'approved' | 'rejected';
 }
 

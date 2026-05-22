@@ -4,6 +4,7 @@ import React, { useState, useRef } from "react";
 import Button from "@/components/atoms/Button";
 import ProgresRegis from "../atoms/ProgresRegis";
 import RegistrationSuccess from "./AfterRegistesMisi";
+import { MisiService } from "@/services/MisiService";
 
 interface FormRegisterMisiProps {
   misiId: string;
@@ -63,21 +64,20 @@ export default function FormRegisterMisi({
 
     try {
       const submitData = new FormData();
-      submitData.append("misi_id", misiId);
-      submitData.append("nama", formData.nama);
-      submitData.append("tanggal_lahir", formData.tanggal_ulang_tahun);
-      submitData.append("phone", formData.nomor_hp);
-      submitData.append("domisili", formData.domisili);
-      submitData.append("skill_file", skillFile);
+      submitData.append("mission_id", misiId);
+      submitData.append("full_name", formData.nama);
+      submitData.append("birth_date", formData.tanggal_ulang_tahun);
+      submitData.append("phone_number", formData.nomor_hp);
+      submitData.append("domicile", formData.domisili);
+      submitData.append("skills", skillFile);
 
-      // Simulasi delay — ganti dengan API call saat BE siap:
-      // await MisiService.applyMisiWithFile(submitData);
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      await MisiService.apply(submitData);
 
       setIsSuccess(true); // tampilkan popup sukses, JANGAN panggil onSuccess di sini
-    } catch (err: unknown) {
+    } catch (err: any) {
       console.error(err);
       setError(
+        err.response?.data?.message || 
         "Terjadi kendala saat mengirim data pendaftaran. Silakan coba kembali."
       );
     } finally {
