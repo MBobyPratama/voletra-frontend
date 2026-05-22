@@ -7,8 +7,10 @@ import { AuthService } from "@/services/AuthService";
 import { getErrorMessage, getFieldErrors } from "@/lib/error";
 
 export default function AuthModal() {
-  const { setAuth, redirectTo, clearRedirectTo, isModalOpen, closeModal } = useAuthStore();
+  const { setAuth, redirectTo, clearRedirectTo, isModalOpen, closeModal, setTempSignupData } = useAuthStore();
   const [tab, setTab] = useState<"login" | "signup">("login");
+
+  const router = useRouter();
 
   // shared
   const [email, setEmail] = useState("");
@@ -20,8 +22,6 @@ export default function AuthModal() {
   const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
-
-  const router = useRouter();
 
   const resetForm = () => {
     setEmail("");
@@ -41,15 +41,27 @@ export default function AuthModal() {
     setLoading(true);
     setError("");
     try {
-      const response = await AuthService.login({ email, password });
+      const response = await AuthService.login({
+        email,
+        password,
+      });
       if (response.success) {
-        setAuth(response.data.token, response.data.role, response.data.user);
+        const tokenToStore = response.data.token || 'session';
+        const userToStore = response.data.user || {
+          id: response.data.user_id || 'unknown',
+          email: response.data.email || email,
+          name: response.data.name || 'User',
+        };
+        
+        setAuth(tokenToStore, response.data.role, userToStore);
         closeModal();
         resetForm();
 
         if (redirectTo) {
           router.push(redirectTo);
           clearRedirectTo();
+        } else if (response.data.redirect_url && response.data.redirect_url !== '/') {
+          router.push(response.data.redirect_url);
         } else {
           router.push(response.data.role === "volunteer" ? "/dashboard/relawan" : "/dashboard/pelapor");
         }
@@ -66,18 +78,25 @@ export default function AuthModal() {
     setLoading(true);
     setError("");
     setFieldErrors({});
+
+    // Client-side validation for confirm password
+    if (password !== confirmPassword) {
+      setFieldErrors({ confirm_password: ["Password dan konfirmasi password tidak cocok"] });
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await AuthService.register({ email, password, confirm_password: confirmPassword, name });
-      if (response.success) {
-        setAuth(response.data.token, response.data.role, response.data.user);
-        closeModal();
-        resetForm();
-        // Role null → belum pilih role → arahkan ke pilih-role
-        router.push(response.data.role ? "/dashboard" : "/pilih-role");
-      }
+      // Simpan data pendaftaran sementara
+      setTempSignupData({ email, password, confirm_password: confirmPassword, name });
+      
+      closeModal();
+      resetForm();
+      
+      // Arahkan ke pilih role untuk melakukan registrasi yang sesungguhnya
+      router.push("/pilih-role");
     } catch (err: unknown) {
-      setFieldErrors(getFieldErrors(err));
-      setError(getErrorMessage(err, "Registrasi gagal. Silakan coba lagi."));
+      setError("Terjadi kesalahan. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }

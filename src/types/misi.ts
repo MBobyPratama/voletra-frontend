@@ -15,6 +15,7 @@ export interface Misi {
   foto: string[]; // URLs or file names from backend
   status: MisiStatus;
   mode?: 'Online' | 'Offline';
+  coordinator_whatsapp?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,5 +42,7 @@ export interface CreateMisiRequest {
   jumlah_relawan: number;
   tanggal_mulai?: string;
   tanggal_selesai?: string;
+  coordinator_whatsapp?: string;
   foto: File[];
+  mode: 'Online' | 'Offline';
 }

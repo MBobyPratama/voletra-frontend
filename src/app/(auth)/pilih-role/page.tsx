@@ -1,89 +1,122 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { AuthService } from "@/services/AuthService";
 import { useAuthStore } from "@/app/store/authStore";
-import { getErrorMessage } from "@/lib/error";
+import { getErrorMessage, getFieldErrors } from "@/lib/error";
 
 export default function RoleModal() {
   const router = useRouter();
-  const { setAuth, token, user } = useAuthStore();
+  const { setAuth, tempSignupData, setTempSignupData } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    // Jika tidak ada data pendaftaran sementara, balikkan ke home
+    if (!tempSignupData) {
+      router.push("/");
+    }
+  }, [tempSignupData, router]);
+
   const handlePilih = async (role: "lembaga" | "volunteer") => {
+    if (!tempSignupData) return;
+
     setIsLoading(true);
     setError("");
     try {
-      const response = await AuthService.updateRole(role);
+      let response;
+      if (role === "volunteer") {
+        response = await AuthService.registerVolunteer(tempSignupData);
+      } else {
+        response = await AuthService.registerLembaga(tempSignupData);
+      }
+
       if (response.success) {
-        // Update store dan cookie dengan role yang baru
-        setAuth(token!, role, user!);
-        router.push(role === "volunteer" ? "/dashboard/relawan" : "/dashboard/pelapor");
+        // Simpan auth ke store dan cookie agar langsung login
+        const tokenToStore = response.data.token || 'session';
+        const userToStore = response.data.user || {
+          id: response.data.user_id || 'unknown',
+          email: response.data.email || tempSignupData.email,
+          name: response.data.name || tempSignupData.name,
+        };
+
+        setAuth(tokenToStore, response.data.role, userToStore);
+
+        // Hapus data pendaftaran sementara
+        setTempSignupData(null);
+        
+        // Langsung arahkan ke dashboard sesuai role (Gunakan window.location untuk memastikan cookie terbaca middleware)
+        window.location.href = role === "volunteer" ? "/dashboard/relawan" : "/dashboard/pelapor";
       }
     } catch (err: unknown) {
-      setError(getErrorMessage(err, "Gagal memilih role. Silakan coba lagi."));
+      const fieldErrors = getFieldErrors(err);
+      if (Object.keys(fieldErrors).length > 0) {
+        // Flatten and join field errors into a single string
+        const allErrors = Object.values(fieldErrors).flat().join(". ");
+        setError(allErrors);
+      } else {
+        setError(getErrorMessage(err, "Gagal melakukan registrasi. Silakan coba lagi."));
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (!tempSignupData) return null;
+
   return (
-    <main>
-      <div className="flex flex-col justify-center items-center h-screen">
-        <div className="p-5 bg-white rounded-2xl shadow-2xl">
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-black text-center">
-              Welcome to Voletra
-            </h2>
-            <h3 className="text-center text-gray-500">Select your role to continue</h3>
-          </div>
+    <main className="min-h-screen bg-[#EAF0FA] flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-[566px] rounded-[10px] shadow-[0px_4px_15px_0px_rgba(0,0,0,0.1)] p-10 flex flex-col items-center">
+        <h1 className="text-[22px] font-semibold text-black mb-2 text-center">Welcome to Voletra</h1>
+        <p className="text-[14px] font-light text-black mb-10 text-center">Select your role to continue</p>
 
-          {error && (
-            <div className="bg-red-50 text-red-500 text-sm p-3 rounded-xl mb-6 text-center border border-red-100">
-              {error}
+        {error && (
+          <div className="bg-red-50 text-red-500 text-[12px] p-3 rounded-lg mb-6 w-full text-center border border-red-100">
+            {error}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full px-4">
+          {/* Volunteer Choice */}
+          <button
+            disabled={isLoading}
+            onClick={() => handlePilih("volunteer")}
+            className="group relative h-[250px] flex items-center justify-center transition-all hover:scale-110 disabled:opacity-50 disabled:hover:scale-100"
+          >
+            <div className="relative w-full h-full">
+              <Image 
+                src="/icons/volunteer.png" 
+                alt="Volunteer" 
+                fill
+                className="object-contain"
+              />
             </div>
-          )}
+          </button>
 
-          <div className="flex p-5 gap-10">
-            <button
-              onClick={() => handlePilih("volunteer")}
-              disabled={isLoading}
-              className="group relative overflow-hidden rounded-2xl cursor-pointer transition duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Image
-                src="/icons/volunteer.png"
-                alt="Volunteer"
-                width={200}
-                height={200}
-                className="rounded-2xl object-cover"
+          {/* Organization Choice */}
+          <button
+            disabled={isLoading}
+            onClick={() => handlePilih("lembaga")}
+            className="group relative h-[250px] flex items-center justify-center transition-all hover:scale-110 disabled:opacity-50 disabled:hover:scale-100"
+          >
+            <div className="relative w-full h-full">
+              <Image 
+                src="/icons/organization.png" 
+                alt="Organization" 
+                fill
+                className="object-contain"
               />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition duration-300" />
-              <p className="text-center font-semibold mt-2">Volunteer (Relawan)</p>
-            </button>
-
-            <button
-              onClick={() => handlePilih("lembaga")}
-              disabled={isLoading}
-              className="group relative overflow-hidden rounded-2xl cursor-pointer transition duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Image
-                src="/icons/organization.png"
-                alt="Organization"
-                width={200}
-                height={200}
-                className="rounded-2xl object-cover"
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition duration-300" />
-              <p className="text-center font-semibold mt-2">Organization (Lembaga)</p>
-            </button>
-          </div>
-
-          {isLoading && (
-            <p className="text-center text-sm text-gray-400 mt-4">Menyimpan pilihan...</p>
-          )}
+            </div>
+          </button>
         </div>
+
+        {isLoading && (
+          <div className="mt-10 flex flex-col items-center">
+            <div className="w-6 h-6 border-2 border-[#2869CA] border-t-transparent rounded-full animate-spin mb-2"></div>
+            <p className="text-sm text-gray-500 font-medium">Creating your account...</p>
+          </div>
+        )}
       </div>
     </main>
   );
