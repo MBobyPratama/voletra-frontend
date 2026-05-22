@@ -201,12 +201,11 @@ export default function MissionDetailCard({
               Edit Misi
             </button>
           ) : applyStatus === "Pending" ? (
-            <button
-              disabled
-              className="bg-gray-100 text-gray-400 font-medium px-10 py-3 rounded-xl cursor-not-allowed w-full sm:w-auto"
-            >
-              Pending
-            </button>
+            <div className="bg-[#3349c6] flex items-center justify-center p-[10px] rounded-[10px] w-[293px]">
+              <span className="font-['Poppins:Medium',sans-serif] text-[#eaf0fa] text-[16px] whitespace-nowrap">
+                Pending
+              </span>
+            </div>
           ) : (
             <button
               onClick={handlePrimaryAction}

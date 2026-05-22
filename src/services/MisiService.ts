@@ -86,6 +86,10 @@ export const MisiService = {
     const response = await axiosInstance.get(`/misi/${id}/applicants`);
     return response.data;
   },
+  getAppliedByRelawan: async () => {
+    const response = await axiosInstance.get("/apply/me");
+    return response.data;
+  },
   approveApplicant: async (applyId: string): Promise<void> => {
     const response = await axiosInstance.patch(`/apply/${applyId}/approve`);
     return response.data;
@@ -148,6 +152,11 @@ export const MisiService = {
     });
 
     const response = await axiosInstance.patch(`/misi/${id}`, formData);
+    return response.data;
+  },
+
+  apply: async (data: FormData): Promise<any> => {
+    const response = await axiosInstance.post("/apply", data);
     return response.data;
   },
 };

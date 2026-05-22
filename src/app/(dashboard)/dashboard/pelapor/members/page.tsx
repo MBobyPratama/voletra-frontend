@@ -73,9 +73,9 @@ export default function MembersPage() {
             : m
         )
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to approve applicant:', error);
-      alert('Gagal menyetujui relawan.');
+      alert(error.response?.data?.message || 'Gagal menyetujui relawan.');
     } finally {
       setIsProcessing(false);
     }
@@ -98,9 +98,9 @@ export default function MembersPage() {
             : m
         )
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to reject applicant:', error);
-      alert('Gagal menolak relawan.');
+      alert(error.response?.data?.message || 'Gagal menolak relawan.');
     } finally {
       setIsProcessing(false);
     }
@@ -108,7 +108,10 @@ export default function MembersPage() {
 
   const filteredMissions = missions.filter(m => 
     m.judul?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    m.applicants.some(app => app.nama?.toLowerCase().includes(searchQuery.toLowerCase()))
+    m.applicants.some(app => 
+      (app.full_name || app.nama || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (app.domicile || app.domisili || '').toLowerCase().includes(searchQuery.toLowerCase())
+    )
   );
 
   return (
@@ -116,25 +119,25 @@ export default function MembersPage() {
       <Sidebar />
       <main className="flex-1 ml-64 p-8">
         <div className="mb-8">
-          <h1 className="text-[24px] font-medium text-black mb-6">Manage Members</h1>
+          <h1 className="text-[24px] font-medium text-black mb-6 font-['Poppins:Medium',sans-serif]">Manage Members</h1>
           
           {/* Search Bar */}
-          <div className="relative max-w-[891px]">
+          <div className="relative max-w-[1091px]">
             <input
               type="text"
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-[43px] border border-[rgba(0,0,0,0.32)] rounded-[8px] pl-10 pr-4 text-[16px] outline-none focus:border-[#2869CA] transition-colors"
+              className="w-full h-[43px] bg-white border border-[rgba(0,0,0,0.32)] rounded-[8px] pl-10 pr-4 text-[16px] text-black placeholder:text-[rgba(0,0,0,0.63)] outline-none focus:border-[#2869CA] transition-colors font-['Poppins:Medium',sans-serif]"
             />
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg" />
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(0,0,0,0.63)] text-lg" />
           </div>
         </div>
 
         {isLoading ? (
           <div className="space-y-6">
             {[1, 2].map((i) => (
-              <div key={i} className="h-[300px] bg-white rounded-xl animate-pulse shadow-sm" />
+              <div key={i} className="h-[300px] bg-white rounded-xl animate-pulse shadow-sm border border-[rgba(0,0,0,0.12)]" />
             ))}
           </div>
         ) : error ? (
@@ -148,24 +151,24 @@ export default function MembersPage() {
             </button>
           </div>
         ) : filteredMissions.length === 0 ? (
-          <div className="text-center p-12 bg-white rounded-[10px] shadow-sm">
+          <div className="text-center p-12 bg-white rounded-[10px] shadow-sm border border-[rgba(0,0,0,0.12)] max-w-[1091px]">
             <p className="text-gray-500">Tidak ada data member yang ditemukan.</p>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-8 max-w-[1091px]">
             {filteredMissions.map((misi) => {
               const photos = misi.foto || [];
               const thumbnail = photos.length > 0 
                 ? (photos[0].startsWith('http') ? photos[0] : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${photos[0]}`)
-                : 'https://via.placeholder.com/200x150?text=No+Image';
+                : 'https://via.placeholder.com/66x66?text=Misi';
               
               const displayJudul = misi.judul || 'No Title';
 
               return (
                 <div key={misi.id} className="bg-white rounded-[10px] shadow-sm overflow-hidden border border-[rgba(0,0,0,0.12)]">
                   {/* Mission Header */}
-                  <div className="p-6 flex items-center gap-4 border-b border-[rgba(0,0,0,0.12)]">
-                    <div className="w-[66px] h-[66px] relative rounded-[6px] overflow-hidden shrink-0">
+                  <div className="px-6 py-4 flex items-center gap-4">
+                    <div className="w-[66px] h-[66px] relative rounded-[6px] overflow-hidden shrink-0 border border-[rgba(0,0,0,0.05)]">
                       <Image 
                         src={thumbnail} 
                         alt={displayJudul} 
@@ -173,11 +176,11 @@ export default function MembersPage() {
                         className="object-cover"
                       />
                     </div>
-                    <h2 className="text-[20px] font-semibold text-black">{displayJudul}</h2>
+                    <h2 className="text-[20px] font-semibold text-black font-['Poppins:SemiBold',sans-serif]">{displayJudul}</h2>
                   </div>
 
                   {/* Applicants Table */}
-                  <div className="p-[20px]">
+                  <div className="px-[17px] pb-[17px]">
                     <ApplicantTable 
                       applicants={misi.applicants}
                       onApprove={(applyId) => handleApprove(misi.id, applyId)}
