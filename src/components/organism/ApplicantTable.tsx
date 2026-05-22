@@ -41,7 +41,7 @@ export default function ApplicantTable({ applicants, onApprove, onDecline, isPro
                 <div className="flex items-center gap-[10px]">
                   <div className="relative w-[48px] h-[48px] rounded-full overflow-hidden bg-gray-200 shrink-0">
                     {/* Placeholder avatar */}
-                    <Image src="https://via.placeholder.com/48" alt={applicant.nama} fill className="object-cover" />
+                    <Image src="https://via.placeholder.com/48" alt={applicant.nama || 'Relawan'} fill className="object-cover" />
                   </div>
                   <p className="font-medium text-[16px] text-black">{applicant.nama}</p>
                 </div>

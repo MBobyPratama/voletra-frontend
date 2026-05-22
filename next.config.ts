@@ -17,8 +17,8 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "ui-avatars.com",
-        pathname: "/api/**",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
       },
       {
         protocol: "https",

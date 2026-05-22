@@ -1,5 +1,5 @@
 "use client";
-import react, { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Misi } from "@/types/misi";
@@ -32,20 +32,23 @@ export default function MissionDetailCard({
   const isRelawan = pathname?.includes("/dashboard/relawan");
 
   // fallback jika data foto kosong atau tidak terdefinisi
+  const photos = misi?.foto || [];
   const mainImage =
-    misi?.foto && misi.foto.length > 0
-      ? misi.foto[0].startsWith("http")
-        ? misi.foto[0]
-        : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${misi.foto[0]}`
+    photos.length > 0
+      ? photos[0].startsWith('http')
+        ? photos[0]
+        : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${photos[0]}`
       : null;
 
-  const galleryImages = (misi?.foto || [])
-    .slice(1, 4)
-    .map((f) =>
-      f.startsWith("http")
-        ? f
-        : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${f}`
-    );
+  const galleryImages = photos.slice(1, 4).map((f: string) =>
+    f.startsWith('http') ? f : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${f}`
+  );
+
+  const judul = misi?.judul || 'No Title';
+  const deskripsi = misi?.deskripsi || 'No Description';
+  const alamat = misi?.alamat || 'No Location';
+  const start_date = misi?.tanggal_mulai;
+  const end_date = misi?.tanggal_selesai;
 
   // Navigasi tombol kembali dengan fallback jika onBack tidak di-passing dari parent
   const handleBackAction = () => {
@@ -60,7 +63,7 @@ export default function MissionDetailCard({
     return (
       <FormRegisterMisi
         misiId={misi.id}
-        misiJudul={misi.judul}
+        misiJudul={judul}
         onCancel={() => setShowRegisterForm(false)} // Jika klik batal, set ke false lagi (balik ke detail)
         onSuccess={() => {
           setShowRegisterForm(false);
@@ -80,8 +83,8 @@ export default function MissionDetailCard({
       if (onEdit) {
         onEdit();
       } else {
-        alert(`Mengarahkan ke halaman edit misi: ${misi.judul}`);
-        router.push(`/dashboard/pelapor/misi/${misi.id}/edit`);
+        // Jika pelapor belum mengimplementasikan fungsi onEdit, arahkan ke rute edit standard
+        router.push(`/dashboard/pelapor/misi/${misi.id}/edit`); // Sesuaikan rute edit proyek Anda
       }
     } else if (isRelawan) {
       setShowRegisterForm(true);
@@ -98,29 +101,24 @@ export default function MissionDetailCard({
   }
 
   return (
-    <div className="relative bg-white rounded-2xl p-20 shadow-sm animate-fade-in">
+    <div className="bg-white rounded-2xl p-6 shadow-sm animate-fade-in overflow-hidden relative">
       {/* Tombol Kembali & Status */}
       <div className="flex items-center justify-between mb-6">
         <StatusBadge status={misi.status} />
         <button
           onClick={handleBackAction}
-          className="absolute top-4 right-4 w-9 h-9  text-gray-500 hover:text-black hover:shadow-md transition-all text-xl"
+          className="absolute top-4 right-4 w-9 h-9 text-gray-500 hover:text-black hover:shadow-md transition-all text-xl"
           aria-label="Tutup"
         >
           ×
         </button>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-6 min-w-0">
         {/* Main Image */}
         <div className="relative w-full lg:w-[320px] h-[260px] rounded-xl overflow-hidden bg-gray-200 shrink-0">
           {mainImage ? (
-            <Image
-              src={mainImage}
-              alt={misi.judul}
-              fill
-              className="object-cover"
-            />
+            <Image src={mainImage} alt={judul} fill className="object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400">
               <svg
@@ -141,60 +139,55 @@ export default function MissionDetailCard({
         </div>
 
         {/* Info Konten */}
-        <div className="flex-1 flex flex-col justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-black mb-3">{misi.judul}</h2>
-            <p className="text-sm text-gray-600 leading-relaxed mb-4">
-              {misi.deskripsi}
-            </p>
+        <div className="flex-1 flex flex-col justify-between min-w-0 w-full">
+          <div className="w-full max-w-full">
+            <h2 className="text-2xl font-bold text-black mb-3 break-words">{judul}</h2>
+            <p className="text-sm text-gray-600 leading-relaxed mb-4 break-words whitespace-pre-wrap w-full">{deskripsi}</p>
 
             {/* Gallery */}
             {galleryImages.length > 0 && (
-              <div className="flex gap-3 mb-4">
-                {galleryImages.map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="relative w-[90px] h-[90px] rounded-lg overflow-hidden"
-                  >
-                    <Image
-                      src={img}
-                      alt={`Gallery ${idx + 1}`}
-                      fill
-                      className="object-cover"
-                    />
+              <div className="flex gap-3 mb-4 overflow-x-auto pb-2">
+                {galleryImages.map((img: string, idx: number) => (
+                  <div key={idx} className="relative w-[90px] h-[90px] rounded-lg overflow-hidden shrink-0">
+                    <Image src={img} alt={`Gallery ${idx + 1}`} fill className="object-cover" />
                   </div>
                 ))}
               </div>
             )}
           </div>
-        </div>
-      </div>
-      {/* Metadata Grid */}
-      <div className="flex flex-cols-2 justify-between gap-y-3 text-sm border-t border-gray-100 pt-4">
-        <div>
-          <p className="text-gray-400 mb-0.5">Category</p>
-          <p className="font-semibold text-black">{misi.kategori}</p>
-        </div>
-        <div>
-          <p className="text-gray-400 mb-0.5">Number of Volunteers</p>
-          <p className="font-semibold text-black">{misi.jumlah_relawan}</p>
-        </div>
-        <div className="col-span-2">
-          <p className="text-gray-400 mb-0.5">Location</p>
-          <p className="font-semibold text-black">{misi.alamat}</p>
-        </div>
-        {misi.tanggal_mulai && (
-          <div>
-            <p className="text-gray-400 mb-0.5">Start Date</p>
-            <p className="font-semibold text-black">{misi.tanggal_mulai}</p>
+
+          {/* Metadata Grid */}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm border-t border-gray-100 pt-4">
+            <div className="min-w-0">
+              <p className="text-gray-400 mb-0.5">Category</p>
+              <p className="font-semibold text-black break-words">{misi.kategori || 'N/A'}</p>
+            </div>
+            <div className="min-w-0">
+              <p className="text-gray-400 mb-0.5">Number of Volunteers</p>
+              <p className="font-semibold text-black">{misi.jumlah_relawan || 0}</p>
+            </div>
+            <div className="min-w-0">
+              <p className="text-gray-400 mb-0.5">Event Mode</p>
+              <p className="font-semibold text-black capitalize">{misi.mode || 'offline'}</p>
+            </div>
+            <div className="col-span-1 min-w-0">
+              <p className="text-gray-400 mb-0.5">Location</p>
+              <p className="font-semibold text-black break-words">{alamat}</p>
+            </div>
+            {start_date && (
+              <div className="min-w-0">
+                <p className="text-gray-400 mb-0.5">Start Date</p>
+                <p className="font-semibold text-black">{new Date(start_date).toLocaleDateString()}</p>
+              </div>
+            )}
+            {end_date && (
+              <div className="min-w-0">
+                <p className="text-gray-400 mb-0.5">End Date</p>
+                <p className="font-semibold text-black">{new Date(end_date).toLocaleDateString()}</p>
+              </div>
+            )}
           </div>
-        )}
-        {misi.tanggal_selesai && (
-          <div>
-            <p className="text-gray-400 mb-0.5">End Date</p>
-            <p className="font-semibold text-black">{misi.tanggal_selesai}</p>
-          </div>
-        )}
+        </div>
       </div>
 
       {/* Action Button */}
@@ -208,7 +201,6 @@ export default function MissionDetailCard({
               Edit Misi
             </button>
           ) : applyStatus === "Pending" ? (
-            // ← tombol disabled saat pending
             <button
               disabled
               className="bg-gray-100 text-gray-400 font-medium px-10 py-3 rounded-xl cursor-not-allowed w-full sm:w-auto"

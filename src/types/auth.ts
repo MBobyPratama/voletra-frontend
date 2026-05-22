@@ -11,15 +11,19 @@ export interface RegisterRequest {
 }
 
 export interface AuthResponse {
-  success: boolean; // ← tambah, kamu pakai ini di RoleModal & login page
-  message: string;  // ← tambah, untuk error handling
-  data: {           // ← wrap ke dalam 'data' — sesuai response BE sebelumnya
-    token: string;
-    role: 'volunteer' | 'lembaga' | null; // ← null karena setelah register belum punya role
-    user: {
+  success: boolean;
+  message: string;
+  data: {
+    token?: string;
+    role: 'volunteer' | 'lembaga' | null;
+    user?: {
       id: string;
       email: string;
       name: string;
     };
+    user_id?: string;
+    name?: string;
+    email?: string;
+    redirect_url?: string;
   };
 }

@@ -4,9 +4,6 @@ import { useAuthStore } from '@/app/store/authStore';
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true, // Crucial for sending cookies to backend
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Request Interceptor
@@ -33,9 +30,9 @@ axiosInstance.interceptors.response.use(
       // Clear auth state on the frontend
       useAuthStore.getState().clearAuth();
       
-      // Redirect to login only if we are in the browser
+      // Redirect to home only if we are in the browser
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        window.location.href = '/';
       }
     }
 

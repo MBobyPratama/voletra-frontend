@@ -150,7 +150,7 @@ function PublicMissionCard({
         {thumbnail && (
           <Image
             src={thumbnail}
-            alt={misi.judul}
+            alt={misi.judul || 'Misi'}
             fill
             className="object-cover"
           />

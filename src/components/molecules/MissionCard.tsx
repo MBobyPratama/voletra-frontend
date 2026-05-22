@@ -19,7 +19,7 @@ const MissionCard: React.FC<MissionCardProps> = ({ misi }) => {
       <div className="h-48 relative">
         <Image 
           src={thumbnail} 
-          alt={misi.judul} 
+          alt={misi.judul || 'Misi'} 
           fill
           className="object-cover"
         />
@@ -30,7 +30,18 @@ const MissionCard: React.FC<MissionCardProps> = ({ misi }) => {
       
       <div className="p-6 flex flex-col flex-1">
         <div className="mb-4">
-          <h3 className="text-xl font-bold text-[#122F5B] mb-2 line-clamp-1">{misi.judul}</h3>
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="text-xl font-bold text-[#122F5B] line-clamp-1 flex-1">{misi.judul}</h3>
+            {misi.mode && (
+              <span className={`ml-2 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
+                misi.mode === 'Online' 
+                  ? 'bg-green-100 text-green-700 border border-green-200' 
+                  : 'bg-orange-100 text-orange-700 border border-orange-200'
+              }`}>
+                {misi.mode}
+              </span>
+            )}
+          </div>
           <div className="flex items-start text-gray-500 mb-3">
             <svg className="w-5 h-5 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

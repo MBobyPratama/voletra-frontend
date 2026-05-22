@@ -1,126 +1,121 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { AuthService } from "@/services/AuthService";
 import { useAuthStore } from "@/app/store/authStore";
-import { getErrorMessage } from "@/lib/error"; // ← pakai helper yang sudah ada
+import { getErrorMessage, getFieldErrors } from "@/lib/error";
 
 export default function PilihRolePage() {
   const router = useRouter();
-  const { setAuth, token, role, user } = useAuthStore();
+  const { setAuth, tempSignupData, setTempSignupData } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!token) {
-      router.push("/login");
-    } else if (role === "volunteer") {
-      router.push("/dashboard/relawan");
-    } else if (role === "lembaga") {
-      router.push("/dashboard/pelapor");
+    // Jika tidak ada data pendaftaran sementara, balikkan ke home
+    if (!tempSignupData) {
+      router.push("/");
     }
-  }, [token, role, router]);
+  }, [tempSignupData, router]);
 
-  const handlePilih = async (selectedRole: "volunteer" | "lembaga") => {
-    if (!token || !user) {
-      setError("Sesi tidak valid, silakan login ulang.");
-      router.push("/login");
-      return;
-    }
+  const handlePilih = async (role: "lembaga" | "volunteer") => {
+    if (!tempSignupData) return;
 
     setIsLoading(true);
     setError("");
     try {
-      // ↓ updateRole dipanggil di sini — pastikan endpoint BE sudah sesuai
-      const response = await AuthService.updateRole(selectedRole);
+      let response;
+      if (role === "volunteer") {
+        response = await AuthService.registerVolunteer(tempSignupData);
+      } else {
+        response = await AuthService.registerLembaga(tempSignupData);
+      }
+
       if (response.success) {
-        setAuth(token, selectedRole, user);
-        router.push(
-          selectedRole === "volunteer"
-            ? "/dashboard/relawan"
-            : "/dashboard/pelapor"
-        );
+        // Simpan auth ke store dan cookie agar langsung login
+        const tokenToStore = response.data.token || 'session';
+        const userToStore = response.data.user || {
+          id: response.data.user_id || 'unknown',
+          email: response.data.email || tempSignupData.email,
+          name: response.data.name || tempSignupData.name,
+        };
+
+        setAuth(tokenToStore, response.data.role, userToStore);
+
+        // Hapus data pendaftaran sementara
+        setTempSignupData(null);
+        
+        // Langsung arahkan ke dashboard sesuai role (Gunakan window.location untuk memastikan cookie terbaca middleware)
+        window.location.href = role === "volunteer" ? "/dashboard/relawan" : "/dashboard/pelapor";
       }
     } catch (err: unknown) {
-      setError(getErrorMessage(err, "Gagal memilih role. Silakan coba lagi.")); // ← pakai helper
+      const fieldErrors = getFieldErrors(err);
+      if (Object.keys(fieldErrors).length > 0) {
+        // Flatten and join field errors into a single string
+        const allErrors = Object.values(fieldErrors).flat().join(". ");
+        setError(allErrors);
+      } else {
+        setError(getErrorMessage(err, "Gagal melakukan registrasi. Silakan coba lagi."));
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (!tempSignupData) return null;
+
   return (
-    <main className="min-h-screen flex items-center justify-center bg-primary-light px-4">
-      <div className="bg-white rounded-3xl shadow-xl p-10 w-full max-w-lg">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold text-black mb-2">
-            Welcome to Voletra
-          </h2>
-          <p className="text-gray-500 text-sm">
-            Pilih role kamu untuk melanjutkan
-          </p>
-        </div>
+    <main className="min-h-screen bg-[#EAF0FA] flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-[566px] rounded-[10px] shadow-[0px_4px_15px_0px_rgba(0,0,0,0.1)] p-10 flex flex-col items-center">
+        <h1 className="text-[22px] font-semibold text-black mb-2 text-center">Welcome to Voletra</h1>
+        <p className="text-[14px] font-light text-black mb-10 text-center">Select your role to continue</p>
 
         {error && (
-          <div className="bg-red-50 text-red-500 text-sm p-3 rounded-xl mb-6 text-center border border-red-100">
+          <div className="bg-red-50 text-red-500 text-[12px] p-3 rounded-lg mb-6 w-full text-center border border-red-100">
             {error}
           </div>
         )}
 
-        <div className="flex p-5 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full px-4">
+          {/* Volunteer Choice */}
           <button
-            onClick={() => handlePilih("volunteer")}
             disabled={isLoading}
-            className="group relative overflow-hidden rounded-2xl cursor-pointer transition duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => handlePilih("volunteer")}
+            className="group relative h-[250px] flex items-center justify-center transition-all hover:scale-110 disabled:opacity-50 disabled:hover:scale-100"
           >
-            <Image
-              src="/icons/volunteer.png"
-              alt="Volunteer"
-              width={200}
-              height={200}
-              className="rounded-2xl object-cover"
-            />
+            <div className="relative w-full h-full">
+              <Image 
+                src="/icons/volunteer.png" 
+                alt="Volunteer" 
+                fill
+                className="object-contain"
+              />
+            </div>
           </button>
 
+          {/* Organization Choice */}
           <button
-            onClick={() => handlePilih("lembaga")}
             disabled={isLoading}
-            className="group relative overflow-hidden rounded-2xl cursor-pointer transition duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => handlePilih("lembaga")}
+            className="group relative h-[250px] flex items-center justify-center transition-all hover:scale-110 disabled:opacity-50 disabled:hover:scale-100"
           >
-            <Image
-              src="/icons/organization.png"
-              alt="Organization"
-              width={200}
-              height={200}
-              className="rounded-2xl object-cover"
-            />
+            <div className="relative w-full h-full">
+              <Image 
+                src="/icons/organization.png" 
+                alt="Organization" 
+                fill
+                className="object-contain"
+              />
+            </div>
           </button>
         </div>
 
         {isLoading && (
-          <p className="text-center text-sm text-gray-400 mt-6 flex items-center justify-center gap-2">
-            <svg
-              className="animate-spin h-4 w-4 text-primary-normal"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
-            Menyimpan pilihan...
-          </p>
+          <div className="mt-10 flex flex-col items-center">
+            <div className="w-6 h-6 border-2 border-[#2869CA] border-t-transparent rounded-full animate-spin mb-2"></div>
+            <p className="text-sm text-gray-500 font-medium">Creating your account...</p>
+          </div>
         )}
       </div>
     </main>

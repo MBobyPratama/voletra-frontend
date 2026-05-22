@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { RegisterRequest } from "@/types/auth";
 
 export interface User {
   id: string;
@@ -23,7 +24,7 @@ interface AuthState {
   user: User | null;
   isModalOpen: boolean;
   redirectTo: string | null;
-  pendingRegister: PendingRegister | null;
+  tempSignupData: RegisterRequest | null; // Data sementara sebelum pilih role
 
   setAuth: (token: string, role: "volunteer" | "lembaga" | null, user: User) => void;
   clearAuth: () => void;
@@ -31,8 +32,7 @@ interface AuthState {
   closeModal: () => void;
   setRedirectTo: (path: string) => void;
   clearRedirectTo: () => void;
-  setPendingRegister: (data: PendingRegister) => void;
-  clearPendingRegister: () => void;
+  setTempSignupData: (data: RegisterRequest | null) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -43,14 +43,13 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isModalOpen: false,
       redirectTo: null,
-      pendingRegister: null,
+      tempSignupData: null,
 
       openModal: () => set({ isModalOpen: true }),
       closeModal: () => set({ isModalOpen: false }),
       setRedirectTo: (path) => set({ redirectTo: path }),
       clearRedirectTo: () => set({ redirectTo: null }),
-      setPendingRegister: (data) => set({ pendingRegister: data }),
-      clearPendingRegister: () => set({ pendingRegister: null }),
+      setTempSignupData: (data) => set({ tempSignupData: data }),
 
       setAuth: (token, role, user) => {
         set({ token, role, user });
