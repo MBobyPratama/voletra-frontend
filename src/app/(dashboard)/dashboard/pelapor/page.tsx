@@ -110,7 +110,7 @@ export default function PelaporDashboard() {
                   })
                 ) : (
                   <div className="p-12 text-center">
-                    <p className="text-gray-400">You haven't created any missions yet.</p>
+                    <p className="text-gray-400">You haven&apos;t created any missions yet.</p>
                     <Link href="/dashboard/pelapor/buat-laporan" className="mt-4 inline-block text-[#2869CA] font-medium">
                       Create your first mission →
                     </Link>

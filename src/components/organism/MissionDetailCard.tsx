@@ -32,7 +32,7 @@ export default function MissionDetailCard({
   const isRelawan = pathname?.includes("/dashboard/relawan");
 
   // fallback jika data foto kosong atau tidak terdefinisi
-  const photos = misi?.foto || misi?.photos || [];
+  const photos = misi?.foto || [];
   const mainImage =
     photos.length > 0
       ? photos[0].startsWith('http')
@@ -44,11 +44,11 @@ export default function MissionDetailCard({
     f.startsWith('http') ? f : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${f}`
   );
 
-  const judul = misi?.judul || misi?.title || 'No Title';
-  const deskripsi = misi?.deskripsi || misi?.description || 'No Description';
-  const alamat = misi?.alamat || misi?.location || 'No Location';
-  const start_date = misi?.tanggal_mulai || misi?.start_date || misi?.startDate;
-  const end_date = misi?.tanggal_selesai || misi?.end_date || misi?.endDate;
+  const judul = misi?.judul || 'No Title';
+  const deskripsi = misi?.deskripsi || 'No Description';
+  const alamat = misi?.alamat || 'No Location';
+  const start_date = misi?.tanggal_mulai;
+  const end_date = misi?.tanggal_selesai;
 
   // Navigasi tombol kembali dengan fallback jika onBack tidak di-passing dari parent
   const handleBackAction = () => {
@@ -160,15 +160,15 @@ export default function MissionDetailCard({
           <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm border-t border-gray-100 pt-4">
             <div className="min-w-0">
               <p className="text-gray-400 mb-0.5">Category</p>
-              <p className="font-semibold text-black break-words">{misi.kategori || (misi as any).category || 'N/A'}</p>
+              <p className="font-semibold text-black break-words">{misi.kategori || 'N/A'}</p>
             </div>
             <div className="min-w-0">
               <p className="text-gray-400 mb-0.5">Number of Volunteers</p>
-              <p className="font-semibold text-black">{misi.jumlah_relawan || (misi as any).volunteersNeeded || 0}</p>
+              <p className="font-semibold text-black">{misi.jumlah_relawan || 0}</p>
             </div>
             <div className="min-w-0">
               <p className="text-gray-400 mb-0.5">Event Mode</p>
-              <p className="font-semibold text-black capitalize">{misi.mode || (misi as any).event_mode || (misi as any).eventMode || 'offline'}</p>
+              <p className="font-semibold text-black capitalize">{misi.mode || 'offline'}</p>
             </div>
             <div className="col-span-1 min-w-0">
               <p className="text-gray-400 mb-0.5">Location</p>

@@ -57,7 +57,7 @@ export default function RegistrationSuccess({ misiJudul }: RegistrationSuccessPr
             Please wait while we review your application
             {misiJudul && (
               <span className="block mt-1 font-semibold text-gray-700">
-                "{misiJudul}"
+                &quot;{misiJudul}&quot;
               </span>
             )}
           </p>

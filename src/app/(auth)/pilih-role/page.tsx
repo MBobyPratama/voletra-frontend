@@ -6,7 +6,7 @@ import { AuthService } from "@/services/AuthService";
 import { useAuthStore } from "@/app/store/authStore";
 import { getErrorMessage, getFieldErrors } from "@/lib/error";
 
-export default function RoleModal() {
+export default function PilihRolePage() {
   const router = useRouter();
   const { setAuth, tempSignupData, setTempSignupData } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
