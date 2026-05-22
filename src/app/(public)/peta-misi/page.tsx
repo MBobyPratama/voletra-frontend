@@ -1,11 +1,11 @@
 "use client";
 import dynamic from "next/dynamic";
 import AuthModal from "@/components/organism/AuthModal";
-import MissionSection from "@/app/components/MissionSection";
+import MissionSection from "@/components/organism/MissionSection";
 
 // Dynamic import agar Google Maps tidak SSR
 const MapWrapper = dynamic(
-  () => import("@/app/components/organism/MapWrapper"),
+  () => import("@/components/molecules/MapWrapper"),
   {
     ssr: false,
     loading: () => (
