@@ -9,21 +9,78 @@ export const MisiService = {
     kategori?: string;
   }): Promise<Misi[]> => {
     const response = await axiosInstance.get("/misi", { params });
-    return response.data;
+    const missions = response.data;
+    
+    return missions.map((data: any) => ({
+      ...data,
+      judul: data.judul || data.title,
+      deskripsi: data.deskripsi || data.description,
+      kategori: data.kategori || data.category,
+      alamat: data.alamat || data.location,
+      mode: data.mode || (data.event_mode === 'offline' ? 'Offline' : 'Online'),
+      tanggal_mulai: data.tanggal_mulai || data.start_date,
+      tanggal_selesai: data.tanggal_selesai || data.end_date,
+      link_contact: data.link_contact || data.contact_link,
+      jumlah_relawan: data.jumlah_relawan || data.number_of_volunteers,
+      foto: data.foto || data.photos || [],
+    }));
   },
 
   getAll: async (): Promise<Misi[]> => {
     const response = await axiosInstance.get("/misi");
-    return response.data;
+    const missions = response.data;
+    
+    return missions.map((data: any) => ({
+      ...data,
+      judul: data.judul || data.title,
+      deskripsi: data.deskripsi || data.description,
+      kategori: data.kategori || data.category,
+      alamat: data.alamat || data.location,
+      mode: data.mode || (data.event_mode === 'offline' ? 'Offline' : 'Online'),
+      tanggal_mulai: data.tanggal_mulai || data.start_date,
+      tanggal_selesai: data.tanggal_selesai || data.end_date,
+      link_contact: data.link_contact || data.contact_link,
+      jumlah_relawan: data.jumlah_relawan || data.number_of_volunteers,
+      foto: data.foto || data.photos || [],
+    }));
   },
   getById: async (id: string): Promise<Misi> => {
     const response = await axiosInstance.get(`/misi/${id}`);
-    return response.data;
+    const data = response.data;
+    
+    // Map backend response fields to frontend interface fields
+    return {
+      ...data,
+      judul: data.judul || data.title,
+      deskripsi: data.deskripsi || data.description,
+      kategori: data.kategori || data.category,
+      alamat: data.alamat || data.location,
+      mode: data.mode || (data.event_mode === 'offline' ? 'Offline' : 'Online'),
+      tanggal_mulai: data.tanggal_mulai || data.start_date,
+      tanggal_selesai: data.tanggal_selesai || data.end_date,
+      link_contact: data.link_contact || data.contact_link,
+      jumlah_relawan: data.jumlah_relawan || data.number_of_volunteers,
+      foto: data.foto || data.photos || [],
+    };
   },
   getByPelapor: async (status?: string): Promise<Misi[]> => {
     const params = status && status !== "All" ? { status } : {};
     const response = await axiosInstance.get("/misi/pelapor/me", { params });
-    return response.data;
+    const missions = response.data;
+    
+    return missions.map((data: any) => ({
+      ...data,
+      judul: data.judul || data.title,
+      deskripsi: data.deskripsi || data.description,
+      kategori: data.kategori || data.category,
+      alamat: data.alamat || data.location,
+      mode: data.mode || (data.event_mode === 'offline' ? 'Offline' : 'Online'),
+      tanggal_mulai: data.tanggal_mulai || data.start_date,
+      tanggal_selesai: data.tanggal_selesai || data.end_date,
+      link_contact: data.link_contact || data.contact_link,
+      jumlah_relawan: data.jumlah_relawan || data.number_of_volunteers,
+      foto: data.foto || data.photos || [],
+    }));
   },
   getApplicants: async (id: string): Promise<Applicant[]> => {
     const response = await axiosInstance.get(`/misi/${id}/applicants`);
