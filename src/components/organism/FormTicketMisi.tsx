@@ -80,7 +80,7 @@ const FormTicketMisi: React.FC<FormTicketMisiProps> = ({ isEdit, initialData }) 
 
   const [formData, setFormData] = useState<Omit<CreateMisiRequest, 'foto'>>(getInitialValue());
   const [fotos, setFotos] = useState<File[]>([]);
-  const [existingPhotos, setExistingPhotos] = useState<string[]>(initialData?.photos || (initialData as any)?.foto || []);
+  const [existingPhotos, setExistingPhotos] = useState<string[]>(initialData?.foto || []);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -95,7 +95,7 @@ const FormTicketMisi: React.FC<FormTicketMisiProps> = ({ isEdit, initialData }) 
   // Sync existing photos if initialData changes
   useEffect(() => {
     if (initialData) {
-      setExistingPhotos(initialData.photos || (initialData as any)?.foto || []);
+      setExistingPhotos(initialData?.foto || []);
     }
   }, [initialData]);
 

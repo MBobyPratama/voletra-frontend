@@ -5,7 +5,11 @@ import Image from 'next/image';
 import { useAuthStore } from '@/app/store/authStore';
 import { AuthService } from '@/services/AuthService';
 
-const Sidebar = () => {
+interface SidebarProps {
+  activeTab?: string;
+}
+
+const Sidebar = ({ activeTab }: SidebarProps) => {
   const { role, user, clearAuth } = useAuthStore();
   const pathname = usePathname();
 
@@ -112,26 +116,28 @@ const Sidebar = () => {
       </div>
 
       <nav className="flex-1 px-4 py-4 space-y-2">
-        {menuItems.map((item) => (
-          <Link
-            key={item.id}
-            href={item.href}
-            className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all font-medium ${
-              (item.href === '/dashboard/pelapor' || item.href === '/dashboard/relawan')
-                ? pathname === item.href
-                : pathname.startsWith(item.href)
-                ? 'bg-primary-lightActive text-[#122F5B]'
-                : 'text-gray-600 hover:bg-primary-light'
-            } ${
-              (item.href === '/dashboard/pelapor' || item.href === '/dashboard/relawan')
-                ? pathname === item.href ? 'bg-primary-lightActive text-[#122F5B]' : ''
-                : ''
-            }`}
-          >
-            {item.icon}
-            <span>{item.label}</span>
-          </Link>
-        ))}
+        {menuItems.map((item) => {
+          const isActive = activeTab === item.id || (
+            (item.href === '/dashboard/pelapor' || item.href === '/dashboard/relawan')
+              ? pathname === item.href
+              : pathname.startsWith(item.href)
+          );
+
+          return (
+            <Link
+              key={item.id}
+              href={item.href}
+              className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all font-medium ${
+                isActive
+                  ? 'bg-primary-lightActive text-[#122F5B]'
+                  : 'text-gray-600 hover:bg-primary-light'
+              }`}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="p-4 flex items-center justify-between">
