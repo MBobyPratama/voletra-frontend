@@ -256,7 +256,7 @@ export default function RelawanMisiPage() {
                 <div className="flex gap-[14px] justify-end mt-8">
                   {selectedItem.link_lokasi && (
                     <Link
-                      href={`/dashboard/relawan/mission/${selectedItem.misi_id}/location`}
+                      href={`/dashboard/relawan/misi/${selectedItem.misi_id}/location`}
                       className="bg-[#bcd1ef] flex items-center justify-center p-[10px] rounded-[10px] w-[293px]"
                     >
                       <span className="font-['Poppins:Medium',sans-serif] text-[#0e2547] text-[16px] whitespace-nowrap">

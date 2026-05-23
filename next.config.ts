@@ -13,6 +13,15 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: "/dashboard/relawan/mission/:path*",
+        destination: "/dashboard/relawan/misi/:path*",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
