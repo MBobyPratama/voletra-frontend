@@ -30,8 +30,8 @@ export default function RelawanDashboard() {
       <main className="m-25">
         {/* Mengeset sidebar aktif ke menu home */}
         <Sidebar />
-        <div className="bg-gray-100 rounded-2xl mb-10 overflow-hidden border border-gray-200">
-          <MapWrapper />
+        <div className="rounded-2xl mb-10 overflow-hidden border border-gray-200">
+          <MapWrapper height="450px" />
         </div>
 
         <MissionSection />

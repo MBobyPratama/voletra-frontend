@@ -26,8 +26,8 @@ export default function Home() {
           </h2>
 
           {/* Peta */}
-          <div className="w-full h-72 bg-gray-100 rounded-2xl mb-10 overflow-hidden border border-gray-200">
-            <MapWrapper />
+          <div className="w-full mb-10 overflow-hidden rounded-2xl border border-gray-200">
+            <MapWrapper height="288px" />
           </div>
 
           {/* Filter + List Misi */}

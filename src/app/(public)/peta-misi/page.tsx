@@ -24,8 +24,8 @@ export default function PetaMisiPage() {
           <h1 className="text-3xl font-bold text-primary-normal text-center mb-10">
             Peta Misi
           </h1>
-          <div className="w-full h-72 bg-gray-100 rounded-2xl mb-10 overflow-hidden border border-gray-200">
-            <MapWrapper />
+          <div className="w-full mb-10 overflow-hidden rounded-2xl border border-gray-200">
+            <MapWrapper height="500px" />
           </div>
 
           {/* Filter + List Misi */}

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/app/store/authStore";
 import { Misi } from "@/types/misi";
+import { MisiService } from "@/services/MisiService";
 
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -21,107 +22,22 @@ const icon = L.icon({
 const DEFAULT_CENTER: [number, number] = [-2.5489, 118.0149];
 const DEFAULT_ZOOM = 5;
 
-export default function MapWrapper() {
+export default function MapWrapper({ height = "500px" }: { height?: string }) {
   const [missions, setMissions] = useState<Misi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedMission, setSelectedMission] = useState<Misi | null>(null);
 
   const router = useRouter();
-  const { token, openModal, setRedirectTo } = useAuthStore();
+  const { token, role, openModal, setRedirectTo } = useAuthStore();
 
   useEffect(() => {
     const fetchMissions = async () => {
       try {
         setLoading(true);
-        await new Promise((r) => setTimeout(r, 800));
-        setMissions([
-          {
-            id: "map-1",
-            judul: "Distribusi Bantuan Bencana",
-            deskripsi: "",
-            kategori: "Emergency Response",
-            alamat: "Torniang, Aceh Timur",
-            latitude: 4.695135,
-            longitude: 97.750397,
-            jumlah_relawan: 100,
-            foto: [],
-            status: "Open",
-            createdAt: "",
-            updatedAt: "",
-          },
-          {
-            id: "map-2",
-            judul: "Tanggap Banjir",
-            deskripsi: "",
-            kategori: "Emergency Response",
-            alamat: "Tapanuli Utara, Sumatra Utara",
-            latitude: 1.748548,
-            longitude: 99.173393,
-            jumlah_relawan: 100,
-            foto: [],
-            status: "Open",
-            createdAt: "",
-            updatedAt: "",
-          },
-          {
-            id: "map-3",
-            judul: "Peduli Lansia",
-            deskripsi: "",
-            kategori: "Healthcare",
-            alamat: "Jakarta Barat, DKI Jakarta",
-            latitude: -6.19413,
-            longitude: 106.82254,
-            jumlah_relawan: 20,
-            foto: [],
-            status: "Open",
-            createdAt: "",
-            updatedAt: "",
-          },
-          {
-            id: "map-4",
-            judul: "Green Action",
-            deskripsi: "",
-            kategori: "Environment",
-            alamat: "Cisarua, Jawa Barat",
-            latitude: -6.716064,
-            longitude: 106.871048,
-            jumlah_relawan: 50,
-            foto: [],
-            status: "Open",
-            createdAt: "",
-            updatedAt: "",
-          },
-          {
-            id: "map-5",
-            judul: "Gerakan Papua Mengajar",
-            deskripsi: "",
-            kategori: "Education",
-            alamat: "Nabire, Papua Tengah",
-            latitude: -3.369025,
-            longitude: 135.505905,
-            jumlah_relawan: 50,
-            foto: [],
-            status: "Open",
-            createdAt: "",
-            updatedAt: "",
-          },
-          {
-            id: "map-6",
-            judul: "Sehat Setara",
-            deskripsi: "",
-            kategori: "Healthcare",
-            alamat: "Yogyakarta",
-            latitude: -7.79558,
-            longitude: 110.369492,
-            jumlah_relawan: 50,
-            foto: [],
-            status: "Open",
-            createdAt: "",
-            updatedAt: "",
-          },
-        ]);
-      } catch {
+        const data = await MisiService.getMisi();
+        setMissions(data);
+      } catch (err) {
+        console.error("Error fetching missions for map:", err);
         setError("Gagal memuat data misi");
       } finally {
         setLoading(false);
@@ -134,30 +50,38 @@ export default function MapWrapper() {
   // 🔐 AUTH GATE
   const handleAuthAction = (id: string) => {
     if (!token) {
-      setRedirectTo("/peta-misi");
+      setRedirectTo(`/dashboard/relawan/misi/${id}`);
       openModal();
     } else {
-      router.push(`/misi/${id}`);
+      // If user is a volunteer (relawan), go to their dashboard version of mission detail
+      if (role === 'relawan') {
+        router.push(`/dashboard/relawan/misi/${id}`);
+      } else if (role === 'lembaga') {
+        router.push(`/dashboard/pelapor/misi/${id}`);
+      } else {
+        // Fallback or public view if it existed, but for now we follow dashboard paths
+        router.push(`/dashboard/relawan/misi/${id}`);
+      }
     }
   };
 
   // UI STATES
   if (loading) {
     return (
-      <div className="w-full h-[500px] flex items-center justify-center">
-        Loading...
+      <div className="w-full flex items-center justify-center bg-gray-50" style={{ height }}>
+        <div className="w-8 h-8 border-4 border-primary-normal border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  if (error) return <div>{error}</div>;
-  if (missions.length === 0) return <div>Belum ada misi</div>;
+  if (error) return <div className="w-full flex items-center justify-center bg-gray-50 text-red-500" style={{ height }}>{error}</div>;
+  if (missions.length === 0) return <div className="w-full flex items-center justify-center bg-gray-50 text-gray-400" style={{ height }}>Belum ada misi tersedia</div>;
 
   return (
     <MapContainer
       center={DEFAULT_CENTER}
       zoom={DEFAULT_ZOOM}
-      style={{ width: "100%", height: "500px", borderRadius: "16px" }}
+      style={{ width: "100%", height, borderRadius: "16px" }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -173,21 +97,15 @@ export default function MapWrapper() {
             icon={icon}
           >
             <Popup>
-              <div className="min-w-[160px]">
-                <h3 className="font-semibold text-sm text-gray-800 mb-1">
+              <div className="min-w-[160px] p-1">
+                <h3 className="font-semibold text-sm text-gray-800 mb-1 line-clamp-1">
                   {mission.judul}
                 </h3>
                 <p className="text-xs text-gray-500 mb-3">{mission.kategori}</p>
                 <div className="flex flex-col gap-2">
                   <button
                     onClick={() => handleAuthAction(mission.id)}
-                    className="w-full bg-primary-normal text-white py-1.5 rounded-lg text-xs font-semibold"
-                  >
-                    Apply
-                  </button>
-                  <button
-                    onClick={() => handleAuthAction(mission.id)}
-                    className="w-full border border-primary-normal text-primary-normal py-1.5 rounded-lg text-xs font-semibold"
+                    className="w-full bg-primary-normal text-white py-1.5 rounded-lg text-xs font-semibold hover:bg-primary-normalHover transition-colors"
                   >
                     Lihat Detail
                   </button>
