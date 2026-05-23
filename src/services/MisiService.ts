@@ -22,6 +22,8 @@ export const MisiService = {
       tanggal_selesai: data.tanggal_selesai || data.end_date,
       link_contact: data.link_contact || data.contact_link,
       jumlah_relawan: data.jumlah_relawan || data.number_of_volunteers,
+      volunteers_applied: data.volunteers_applied,
+      pending_applicants_count: data.pending_applicants_count,
       foto: data.foto || data.photos || [],
     }));
   },
@@ -41,6 +43,8 @@ export const MisiService = {
       tanggal_selesai: data.tanggal_selesai || data.end_date,
       link_contact: data.link_contact || data.contact_link,
       jumlah_relawan: data.jumlah_relawan || data.number_of_volunteers,
+      volunteers_applied: data.volunteers_applied,
+      pending_applicants_count: data.pending_applicants_count,
       foto: data.foto || data.photos || [],
     }));
   },
@@ -60,6 +64,8 @@ export const MisiService = {
       tanggal_selesai: data.tanggal_selesai || data.end_date,
       link_contact: data.link_contact || data.contact_link,
       jumlah_relawan: data.jumlah_relawan || data.number_of_volunteers,
+      volunteers_applied: data.volunteers_applied,
+      pending_applicants_count: data.pending_applicants_count,
       foto: data.foto || data.photos || [],
     };
   },
@@ -79,6 +85,8 @@ export const MisiService = {
       tanggal_selesai: data.tanggal_selesai || data.end_date,
       link_contact: data.link_contact || data.contact_link,
       jumlah_relawan: data.jumlah_relawan || data.number_of_volunteers,
+      volunteers_applied: data.volunteers_applied,
+      pending_applicants_count: data.pending_applicants_count,
       foto: data.foto || data.photos || [],
     }));
   },
@@ -137,8 +145,13 @@ export const MisiService = {
     }
     if (data.tanggal_mulai) formData.append("start_date", data.tanggal_mulai);
     if (data.tanggal_selesai) formData.append("end_date", data.tanggal_selesai);
-    if (data.latitude) formData.append("latitude", data.latitude.toString());
-    if (data.longitude) formData.append("longitude", data.longitude.toString());
+    
+    if (data.latitude !== undefined && data.latitude !== null) {
+      formData.append("latitude", data.latitude.toString());
+    }
+    if (data.longitude !== undefined && data.longitude !== null) {
+      formData.append("longitude", data.longitude.toString());
+    }
 
     // Append existing photos to keep
     if (data.existingPhotos) {
