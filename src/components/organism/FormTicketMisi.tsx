@@ -19,11 +19,12 @@ const MapPicker = dynamic(() => import('../molecules/MapPicker'), {
 });
 
 const CATEGORY_OPTIONS = [
-  { label: 'Bencana Alam', value: 'Bencana' },
-  { label: 'Kesehatan', value: 'Medis' },
-  { label: 'Edukasi', value: 'Pendidikan' },
-  { label: 'Logistik', value: 'Logistik' },
-  { label: 'Lainnya', value: 'Lainnya' },
+  { label: 'Education', value: 'Education' },
+  { label: 'Disaster Response', value: 'Disaster Response' },
+  { label: 'Medical', value: 'Medical' },
+  { label: 'Logistics', value: 'Logistics' },
+  { label: 'Psychosocial', value: 'Psychosocial' },
+  { label: 'Online Education', value: 'Online Education' },
 ];
 
 interface FormTicketMisiProps {

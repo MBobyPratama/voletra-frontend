@@ -6,7 +6,9 @@ import { MisiService } from '@/services/MisiService';
 import { Applicant, Misi } from '@/types/misi';
 import MissionDetailCard from '@/components/organism/MissionDetailCard';
 import ApplicantTable from '@/components/organism/ApplicantTable';
+import MaterialTable from '@/components/organism/MaterialTable';
 import Sidebar from '@/components/organism/Sidebar';
+import Image from 'next/image';
 import { FiArrowLeft } from 'react-icons/fi';
 
 export default function MissionDetailPage() {
@@ -19,6 +21,7 @@ export default function MissionDetailPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isError, setIsError] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,9 +99,21 @@ export default function MissionDetailPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-[#EAF0FA]">
-        <Sidebar />
-        <main className="flex-1 ml-64 p-8">
-          <div className="animate-pulse flex flex-col gap-6">
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <main className="flex-1 lg:ml-64 flex flex-col min-w-0">
+          {/* Mobile Top Bar */}
+          <div className="lg:hidden bg-white px-6 py-4 flex items-center justify-between shadow-sm sticky top-0 z-30">
+            <div className="flex items-center gap-2">
+               <Image src="/icons/logo_voletra.png" alt="Logo" width={24} height={24} />
+               <span className="font-bold text-blue-600 text-sm tracking-wider uppercase">VOLETRA</span>
+            </div>
+            <button onClick={() => setIsSidebarOpen(true)} className="p-2 -mr-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+               </svg>
+            </button>
+          </div>
+          <div className="p-4 sm:p-8 animate-pulse flex flex-col gap-6">
             <div className="h-[400px] bg-gray-200 rounded-[10px]"></div>
             <div className="h-[300px] bg-gray-200 rounded-[10px]"></div>
           </div>
@@ -110,37 +125,77 @@ export default function MissionDetailPage() {
   if (isError || !misi) {
     return (
       <div className="flex min-h-screen bg-[#EAF0FA]">
-        <Sidebar />
-        <main className="flex-1 ml-64 p-8 flex flex-col items-center justify-center">
-          <p className="text-red-500 font-medium text-lg mb-4">Gagal memuat data misi.</p>
-          <button onClick={() => router.back()} className="text-blue-600 hover:underline">
-            Kembali ke Dashboard
-          </button>
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <main className="flex-1 lg:ml-64 flex flex-col min-w-0">
+          {/* Mobile Top Bar */}
+          <div className="lg:hidden bg-white px-6 py-4 flex items-center justify-between shadow-sm sticky top-0 z-30">
+            <div className="flex items-center gap-2">
+               <Image src="/icons/logo_voletra.png" alt="Logo" width={24} height={24} />
+               <span className="font-bold text-blue-600 text-sm tracking-wider uppercase">VOLETRA</span>
+            </div>
+            <button onClick={() => setIsSidebarOpen(true)} className="p-2 -mr-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+               </svg>
+            </button>
+          </div>
+          <div className="p-4 sm:p-8 flex flex-col items-center justify-center min-h-[60vh]">
+            <p className="text-red-500 font-medium text-lg mb-4">Gagal memuat data misi.</p>
+            <button onClick={() => router.back()} className="text-blue-600 hover:underline">
+              Kembali ke Dashboard
+            </button>
+          </div>
         </main>
       </div>
     );
   }
 
+  const isOnline = misi.mode === 'Online';
+
   return (
     <div className="flex min-h-screen bg-[#EAF0FA]">
-      <Sidebar />
-      <main className="flex-1 ml-64 p-8">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      
+      <main className="flex-1 lg:ml-64 flex flex-col min-w-0">
+        {/* Mobile Top Bar */}
+        <div className="lg:hidden bg-white px-6 py-4 flex items-center justify-between shadow-sm sticky top-0 z-30">
+          <div className="flex items-center gap-2">
+             <Image src="/icons/logo_voletra.png" alt="Logo" width={24} height={24} />
+             <span className="font-bold text-blue-600 text-sm tracking-wider uppercase">VOLETRA</span>
+          </div>
+          <button onClick={() => setIsSidebarOpen(true)} className="p-2 -mr-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+             </svg>
+          </button>
+        </div>
 
-        <div className="flex flex-col gap-[24px]">
-          {/* Mission Detail Card */}
-          <MissionDetailCard 
-            misi={misi} 
-            onEdit={() => router.push(`/dashboard/pelapor/misi/${misi.id}/edit`)} 
-            onDelete={handleDeleteMisi}
-          />
+        <div className="p-4 sm:p-8">
+          <div className="flex flex-col gap-[24px]">
+            {/* Mission Detail Card */}
+            <MissionDetailCard 
+              misi={misi} 
+              onEdit={() => router.push(`/dashboard/pelapor/misi/${misi.id}/edit`)} 
+              onDelete={handleDeleteMisi}
+            />
 
-          {/* Applicants Table */}
-          <ApplicantTable 
-            applicants={applicants}
-            onApprove={handleApprove}
-            onDecline={handleDecline}
-            isProcessing={isProcessing}
-          />
+            {/* Online: Material Table | Offline: Applicant Table */}
+            {isOnline ? (
+              <MaterialTable 
+                applicants={applicants}
+                onApprove={handleApprove}
+                onDecline={handleDecline}
+                isProcessing={isProcessing}
+              />
+            ) : (
+              <ApplicantTable 
+                applicants={applicants}
+                onApprove={handleApprove}
+                onDecline={handleDecline}
+                isProcessing={isProcessing}
+              />
+            )}
+          </div>
         </div>
       </main>
     </div>

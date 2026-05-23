@@ -27,6 +27,7 @@ interface AuthState {
   tempSignupData: RegisterRequest | null; // Data sementara sebelum pilih role
 
   setAuth: (token: string, role: "volunteer" | "lembaga" | null, user: User) => void;
+  setUser: (user: User) => void;
   clearAuth: () => void;
   openModal: () => void;
   closeModal: () => void;
@@ -62,6 +63,8 @@ export const useAuthStore = create<AuthState>()(
           }
         }
       },
+
+      setUser: (user) => set({ user }),
 
       clearAuth: () => {
         set({ token: null, role: null, user: null });

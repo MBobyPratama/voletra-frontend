@@ -3,14 +3,12 @@
 import React from 'react';
 
 const CATEGORIES = [
-  'Emergency Response',
   'Education',
+  'Disaster Response',
+  'Medical',
   'Logistics',
-  'Technology',
-  'Healthcare',
-  'Music',
-  'Elderly Care',
-  'Environment',
+  'Psychosocial',
+  'Online Education',
 ];
 
 const LOCATIONS = ['Jakarta', 'Bandung', 'Surabaya', 'Yogyakarta', 'Medan'];
@@ -34,8 +32,8 @@ const MissionFilter: React.FC<MissionFilterProps> = ({
 }) => {
   return (
     <div className="mb-8">
-      {/* Search + Location */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      {/* Search Bar */}
+      <div className="flex gap-3 mb-6">
         <input
           type="text"
           value={search}
@@ -43,16 +41,6 @@ const MissionFilter: React.FC<MissionFilterProps> = ({
           placeholder="Search"
           className="flex-1 border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none focus:border-primary-normal"
         />
-        <select
-          value={location}
-          onChange={(e) => onLocationChange(e.target.value)}
-          className="w-full sm:w-auto border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none text-gray-500"
-        >
-          <option value="">Your Location</option>
-          {LOCATIONS.map((loc) => (
-            <option key={loc} value={loc}>{loc}</option>
-          ))}
-        </select>
       </div>
 
       {/* Category Radio */}

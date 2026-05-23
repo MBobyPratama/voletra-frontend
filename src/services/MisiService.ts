@@ -176,4 +176,11 @@ export const MisiService = {
   delete: async (id: string): Promise<void> => {
     await axiosInstance.delete(`/misi/${id}`);
   },
+
+  submitMaterial: async (applyId: string, videoLink: string): Promise<any> => {
+    const response = await axiosInstance.patch(`/apply/${applyId}/material`, {
+      video_link: videoLink,
+    });
+    return response.data;
+  },
 };

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { AuthService } from "@/services/AuthService";
 import { getErrorMessage, getFieldErrors } from "@/lib/error";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function AuthModal() {
   const { setAuth, redirectTo, clearRedirectTo, isModalOpen, closeModal, setTempSignupData } = useAuthStore();
@@ -15,12 +16,14 @@ export default function AuthModal() {
   // shared
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // signup only
   const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   const resetForm = () => {
@@ -28,6 +31,8 @@ export default function AuthModal() {
     setPassword("");
     setName("");
     setConfirmPassword("");
+    setShowPassword(false);
+    setShowConfirmPassword(false);
     setError("");
     setFieldErrors({});
   };
@@ -215,12 +220,19 @@ export default function AuthModal() {
                       height={20}
                     />
                     <input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full text-sm outline-none"
                       placeholder="••••••••"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                    >
+                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                   {fieldErrors.password && (
                     <p className="text-red-500 text-xs mt-1">
@@ -327,12 +339,19 @@ export default function AuthModal() {
                       height={20}
                     />
                     <input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full text-sm outline-none"
                       placeholder="••••••••"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                    >
+                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                   {fieldErrors.password && (
                     <p className="text-red-500 text-xs mt-1">
@@ -358,12 +377,19 @@ export default function AuthModal() {
                       height={20}
                     />
                     <input
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className="w-full text-sm outline-none"
                       placeholder="••••••••"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                    >
+                      {showConfirmPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                   {fieldErrors.confirm_password && (
                     <p className="text-red-500 text-xs mt-1">

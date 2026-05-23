@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuthStore } from '@/app/store/authStore';
 import { AuthService } from '@/services/AuthService';
+import { useState } from 'react';
+import ProfileModal from '@/components/molecules/ProfileModal';
 
 interface SidebarProps {
   activeTab?: string;
@@ -14,6 +16,7 @@ interface SidebarProps {
 const Sidebar = ({ activeTab, isOpen, onClose }: SidebarProps) => {
   const { role, user, clearAuth } = useAuthStore();
   const pathname = usePathname();
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const handleLogout = async () => {
     clearAuth();
@@ -163,20 +166,26 @@ const Sidebar = ({ activeTab, isOpen, onClose }: SidebarProps) => {
         </nav>
 
         <div className="p-4 flex items-center justify-between border-t border-gray-100">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden relative shrink-0 border border-gray-100">
+          <div 
+            onClick={() => setIsProfileModalOpen(true)}
+            className="flex items-center gap-3 min-w-0 cursor-pointer hover:bg-gray-50 p-1.5 rounded-xl transition-all flex-1"
+          >
+            <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden relative shrink-0 border border-gray-100 shadow-sm">
               <Image 
-                src={`https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=random`} 
+                src={`https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=2869ca&color=fff`} 
                 alt="Profile" 
                 fill
                 className="object-cover"
               />
             </div>
-            <span className="font-medium text-gray-800 truncate">{user?.name || 'User'}</span>
+            <div className="min-w-0 flex flex-col">
+               <span className="font-semibold text-gray-800 truncate text-sm">{user?.name || 'User'}</span>
+               <span className="text-[10px] text-gray-400 font-medium uppercase tracking-tighter">View Profile</span>
+            </div>
           </div>
           <button 
             onClick={handleLogout}
-            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0"
+            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0 ml-2"
             title="Logout"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -185,6 +194,13 @@ const Sidebar = ({ activeTab, isOpen, onClose }: SidebarProps) => {
           </button>
         </div>
       </div>
+
+      <ProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)} 
+        user={user}
+        role={role}
+      />
     </>
   );
 };

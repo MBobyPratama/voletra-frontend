@@ -38,6 +38,7 @@ export interface Applicant {
   skill?: string; // for skill label/title
   video_link?: string;
   status: 'pending' | 'approved' | 'rejected';
+  updated_at?: string;
 }
 
 export interface CreateMisiRequest {
