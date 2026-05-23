@@ -5,12 +5,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { Misi } from "@/types/misi";
 import StatusBadge from "@/components/atoms/StatusBadge";
 import FormRegisterMisi from "./FormRegisterMisi";
+import DeleteConfirmationModal from "@/components/molecules/DeleteConfirmationModal";
 
 interface MissionDetailCardProps {
   misi: Misi;
   onBack?: () => void; // Diubah menjadi opsional agar halaman pelapor lama tidak error jika belum passing ini
   onRegister?: () => void; // Opsional
   onEdit?: () => void; // Opsional
+  onDelete?: () => void; // Opsional
   extraActions?: React.ReactNode;
   applyStatus?: "Pending" | "Approve" | "Reject";
 }
@@ -20,12 +22,15 @@ export default function MissionDetailCard({
   onBack,
   onRegister,
   onEdit,
+  onDelete,
   extraActions, 
   applyStatus,
 }: MissionDetailCardProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [showRegisterForm, setShowRegisterForm] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Deteksi role secara aman berdasarkan segmentasi URL path
   const isPelapor = pathname?.includes("/dashboard/pelapor");
@@ -88,6 +93,20 @@ export default function MissionDetailCard({
       }
     } else if (isRelawan) {
       setShowRegisterForm(true);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      if (onDelete) {
+        await onDelete();
+      }
+    } catch (error) {
+      console.error("Failed to delete mission:", error);
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -191,15 +210,23 @@ export default function MissionDetailCard({
       </div>
 
       {/* Action Button */}
-      <div className="flex justify-end mt-6 border-t border-gray-100 pt-4">
+      <div className="flex justify-end mt-6 border-t border-gray-100 pt-4 gap-4">
         {extraActions ??
           (isPelapor ? (
-            <button
-              onClick={handlePrimaryAction}
-              className="bg-[#2869CA] hover:bg-[#1E4F98] text-white font-medium px-10 py-3 rounded-xl transition-colors w-full sm:w-auto"
-            >
-              Edit Misi
-            </button>
+            <>
+              <button
+                onClick={() => setIsDeleteModalOpen(true)}
+                className="bg-red-50 text-red-600 hover:bg-red-100 font-medium px-8 py-3 rounded-xl transition-all w-full sm:w-auto border border-red-100"
+              >
+                Hapus Misi
+              </button>
+              <button
+                onClick={handlePrimaryAction}
+                className="bg-[#2869CA] hover:bg-[#1E4F98] text-white font-medium px-10 py-3 rounded-xl transition-colors w-full sm:w-auto"
+              >
+                Edit Misi
+              </button>
+            </>
           ) : applyStatus === "Pending" ? (
             <div className="bg-[#3349c6] flex items-center justify-center p-[10px] rounded-[10px] w-[293px]">
               <span className="font-['Poppins:Medium',sans-serif] text-[#eaf0fa] text-[16px] whitespace-nowrap">
@@ -215,6 +242,16 @@ export default function MissionDetailCard({
             </button>
           ))}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        isLoading={isDeleting}
+        title="Hapus Misi"
+        description={`Apakah Anda yakin ingin menghapus misi "${judul}"? Semua informasi misi, data relawan, dan gambar akan dihapus secara permanen dan tidak dapat dipulihkan.`}
+      />
     </div>
   );
 }

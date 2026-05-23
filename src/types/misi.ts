@@ -11,6 +11,8 @@ export interface Misi {
   link_contact?: string;
   link_lokasi?: string;
   jumlah_relawan: number;
+  volunteers_applied?: number;
+  pending_applicants_count?: number;
   tanggal_mulai?: string;
   tanggal_selesai?: string;
   foto: string[]; // URLs or file names from backend

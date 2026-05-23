@@ -159,4 +159,8 @@ export const MisiService = {
     const response = await axiosInstance.post("/apply", data);
     return response.data;
   },
+
+  delete: async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/misi/${id}`);
+  },
 };
