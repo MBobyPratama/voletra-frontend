@@ -8,14 +8,23 @@ interface StatsOverviewProps {
 
 const StatsOverview: React.FC<StatsOverviewProps> = ({ missions }) => {
   const totalMissions = missions.length;
+  
   const activeMissions = missions.filter(m => {
       const s = (m.status || '').toLowerCase();
-      return ['ongoing', 'sedang_berjalan', 'relawan_terkumpul', 'in progress', 'full'].includes(s);
+      // 'Open', 'In Progress', 'Full', 'Ongoing' are considered active
+      return ['open', 'ongoing', 'in progress', 'full', 'sedang_berjalan', 'relawan_terkumpul'].includes(s);
   }).length;
-  const completedMissions = missions.filter(m => (m.status || '').toLowerCase() === 'completed' || (m.status || '').toLowerCase() === 'selesai').length;
-  const pendingReview = missions.filter(m => (m.status || '').toLowerCase() === 'pending' || (m.status || '').toLowerCase() === 'menunggu_konfirmasi').length;
+
+  const completedMissions = missions.filter(m => 
+    (m.status || '').toLowerCase() === 'completed' || 
+    (m.status || '').toLowerCase() === 'selesai'
+  ).length;
+
+  // Pending Review is the sum of pending applicants across all missions
+  const pendingReview = missions.reduce((acc, curr) => acc + (curr.pending_applicants_count || 0), 0);
   
-  const totalVolunteers = missions.reduce((acc, curr) => acc + (curr.jumlah_relawan || 0), 0);
+  // Total Volunteers is the sum of APPROVED volunteers (volunteers_applied from backend)
+  const totalVolunteers = missions.reduce((acc, curr) => acc + (curr.volunteers_applied || 0), 0);
 
   return (
     <div className="flex flex-wrap gap-[40px] mb-10">

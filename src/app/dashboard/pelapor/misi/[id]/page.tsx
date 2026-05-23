@@ -80,6 +80,19 @@ export default function MissionDetailPage() {
     }
   };
 
+  const handleDeleteMisi = async () => {
+    try {
+      setIsProcessing(true);
+      await MisiService.delete(id);
+      router.push('/dashboard/pelapor/misi');
+    } catch (error) {
+      console.error('Failed to delete mission:', error);
+      alert('Gagal menghapus misi.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-[#EAF0FA]">
@@ -118,6 +131,7 @@ export default function MissionDetailPage() {
           <MissionDetailCard 
             misi={misi} 
             onEdit={() => router.push(`/dashboard/pelapor/misi/${misi.id}/edit`)} 
+            onDelete={handleDeleteMisi}
           />
 
           {/* Applicants Table */}
