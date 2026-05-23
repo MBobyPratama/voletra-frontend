@@ -13,7 +13,7 @@ export default function RegistrationSuccess({ misiJudul }: RegistrationSuccessPr
   const router = useRouter();
 
   const handleDone = () => {
-    router.push('/dashboard/relawan/mission');
+    router.push('/dashboard/relawan/misi');
   };
 
   return (

@@ -179,7 +179,7 @@ export default function MissionSection() {
             onBack={() => setSelectedMisi(null)}
             onRegister={() => {
               setSelectedMisi(null);
-              router.push("/dashboard/relawan/mission");
+              router.push("/dashboard/relawan/misi");
             }}
           />
         </div>
