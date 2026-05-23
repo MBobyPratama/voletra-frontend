@@ -2,7 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async rewrites() {
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
+    const rawBackendUrl = process.env.BACKEND_URL || "http://localhost:5000";
+    // Remove trailing slashes and trailing /api to prevent double prefixes
+    const backendUrl = rawBackendUrl.replace(/\/$/, "").replace(/\/api$/, "");
+    
     return [
       {
         source: "/api/:path*",
