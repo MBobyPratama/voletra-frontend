@@ -1,9 +1,8 @@
-import axiosInstance from '@/lib/axios';
-import { User } from '@/app/store/authStore';
+import axiosInstance from "@/lib/axios";
 
 export const UserService = {
-  getMe: async (): Promise<User> => {
-    const response = await axiosInstance.get('/user/me');
+  updateName: async (name: string): Promise<any> => {
+    const response = await axiosInstance.patch("/user/name", { name });
     return response.data;
   },
 };

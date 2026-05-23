@@ -252,12 +252,12 @@ export default function RelawanMisiPage() {
             <>
               <BackButton />
               <ApprovedRegistration
+                applyId={selectedItem.id}
                 misiJudul={selectedItem.judul}
                 onDone={() => setView("approved-done")}
               />
             </>
           )}
-
           {/* ─── View: Detail setelah Approved + Done (tampilkan tombol WA & Lokasi) ─── */}
           {view === "approved-done" && selectedItem && (
             <>
