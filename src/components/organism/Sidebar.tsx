@@ -7,9 +7,11 @@ import { AuthService } from '@/services/AuthService';
 
 interface SidebarProps {
   activeTab?: string;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-const Sidebar = ({ activeTab }: SidebarProps) => {
+const Sidebar = ({ activeTab, isOpen, onClose }: SidebarProps) => {
   const { role, user, clearAuth } = useAuthStore();
   const pathname = usePathname();
 
@@ -103,65 +105,87 @@ const Sidebar = ({ activeTab }: SidebarProps) => {
   ];
 
   return (
-    <div className="w-64 bg-white flex flex-col h-screen fixed left-0 top-0 shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-index-99">
-      <div className="p-6 flex items-center gap-3">
-        <Image
-          src="/icons/logo_voletra.png"
-          alt="Voletra"
-          width={32}
-          height={32}
-          style={{ width: 'auto' }}
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/40 z-[90] lg:hidden backdrop-blur-sm transition-opacity"
+          onClick={onClose}
         />
-        <span className="text-xl font-bold text-blue-600 tracking-wider font-mono">VOLETRA</span>
-      </div>
+      )}
 
-      <nav className="flex-1 px-4 py-4 space-y-2">
-        {menuItems.map((item) => {
-          const isActive = activeTab === item.id || (
-            (item.href === '/dashboard/pelapor' || item.href === '/dashboard/relawan')
-              ? pathname === item.href
-              : pathname.startsWith(item.href)
-          );
-
-          return (
-            <Link
-              key={item.id}
-              href={item.href}
-              className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all font-medium ${
-                isActive
-                  ? 'bg-primary-lightActive text-[#122F5B]'
-                  : 'text-gray-600 hover:bg-primary-light'
-              }`}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden relative">
-            <Image 
-              src={`https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=random`} 
-              alt="Profile" 
-              fill
-              className="object-cover"
+      {/* Sidebar Container */}
+      <div className={`w-64 bg-white flex flex-col h-screen fixed left-0 top-0 shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-[100] transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Image
+              src="/icons/logo_voletra.png"
+              alt="Voletra"
+              width={32}
+              height={32}
+              style={{ width: 'auto' }}
             />
+            <span className="text-xl font-bold text-blue-600 tracking-wider font-mono uppercase">VOLETRA</span>
           </div>
-          <span className="font-medium text-gray-800">{user?.name || 'Sopo'}</span>
+          
+          {/* Mobile Close Button */}
+          <button onClick={onClose} className="lg:hidden p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+             </svg>
+          </button>
         </div>
-        <button 
-          onClick={handleLogout}
-          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-          </svg>
-        </button>
+
+        <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+          {menuItems.map((item) => {
+            const isActive = activeTab === item.id || (
+              (item.href === '/dashboard/pelapor' || item.href === '/dashboard/relawan')
+                ? pathname === item.href
+                : pathname.startsWith(item.href)
+            );
+
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                onClick={onClose}
+                className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all font-medium ${
+                  isActive
+                    ? 'bg-primary-lightActive text-[#122F5B]'
+                    : 'text-gray-600 hover:bg-primary-light'
+                }`}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="p-4 flex items-center justify-between border-t border-gray-100">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden relative shrink-0 border border-gray-100">
+              <Image 
+                src={`https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=random`} 
+                alt="Profile" 
+                fill
+                className="object-cover"
+              />
+            </div>
+            <span className="font-medium text-gray-800 truncate">{user?.name || 'User'}</span>
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0"
+            title="Logout"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

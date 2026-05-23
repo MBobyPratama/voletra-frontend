@@ -27,7 +27,7 @@ const StatsOverview: React.FC<StatsOverviewProps> = ({ missions }) => {
   const totalVolunteers = missions.reduce((acc, curr) => acc + (curr.volunteers_applied || 0), 0);
 
   return (
-    <div className="flex flex-wrap gap-[40px] mb-10">
+    <div className="grid grid-cols-2 md:flex md:flex-wrap gap-4 sm:gap-6 lg:gap-[40px] mb-10">
       <StatCard label="Total Missions" value={totalMissions} />
       <StatCard label="Active Missions" value={activeMissions} />
       <StatCard label="Completed Missions" value={completedMissions} />
