@@ -236,11 +236,11 @@ const FormTicketMisi: React.FC<FormTicketMisiProps> = ({ isEdit, initialData }) 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative bg-white p-10 rounded-[10px] shadow-sm">
+    <form onSubmit={handleSubmit} className="relative bg-white p-6 sm:p-10 rounded-[10px] shadow-sm">
       {/* Location Access Warning Popup */}
       {showLocationPopup && (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[15px] p-8 max-w-[320px] w-full flex flex-col items-center text-center shadow-lg animate-in fade-in zoom-in duration-300">
+          <div className="bg-white rounded-[15px] p-6 sm:p-8 max-w-[320px] w-full flex flex-col items-center text-center shadow-lg animate-in fade-in zoom-in duration-300">
             <div className="w-40 h-32 mb-6 relative">
               <div className="w-full h-full bg-blue-50 rounded-full flex items-center justify-center">
                  <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,8 +272,8 @@ const FormTicketMisi: React.FC<FormTicketMisiProps> = ({ isEdit, initialData }) 
 
       {/* Map Selection Popup */}
       {showMapSelection && (
-        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[15px] max-w-[800px] w-full h-[600px] overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-white rounded-[15px] max-w-[800px] w-full h-[90vh] sm:h-[600px] overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in duration-300">
             <div className="p-4 border-b flex justify-between items-center bg-gray-50">
               <h3 className="font-semibold text-lg text-gray-800">Select Location</h3>
               <button 
@@ -288,7 +288,7 @@ const FormTicketMisi: React.FC<FormTicketMisiProps> = ({ isEdit, initialData }) 
             </div>
             
             <div className="flex-1 relative flex flex-col">
-              <div className="p-4 bg-white shadow-sm z-10">
+              <div className="p-3 sm:p-4 bg-white shadow-sm z-10">
                 <div className="relative">
                   <input 
                     type="text" 
@@ -307,7 +307,7 @@ const FormTicketMisi: React.FC<FormTicketMisiProps> = ({ isEdit, initialData }) 
                   )}
                 </div>
                 
-                <div className="mt-3 space-y-1 max-h-[120px] overflow-y-auto">
+                <div className="mt-3 space-y-1 max-h-[100px] sm:max-h-[120px] overflow-y-auto">
                   {searchResults.length > 0 ? (
                     searchResults.map((result) => (
                       <button 
@@ -342,7 +342,7 @@ const FormTicketMisi: React.FC<FormTicketMisiProps> = ({ isEdit, initialData }) 
                   initialLng={formData.longitude}
                 />
                 
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[200px] px-4 z-[1000]">
+                <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[180px] sm:max-w-[200px] px-4 z-[1000]">
                    <button 
                     type="button"
                     onClick={() => setShowMapSelection(false)}
@@ -357,13 +357,13 @@ const FormTicketMisi: React.FC<FormTicketMisiProps> = ({ isEdit, initialData }) 
         </div>
       )}
 
-      <div className="absolute right-6 top-6 cursor-pointer text-gray-400 hover:text-gray-600" onClick={() => router.back()}>
+      <div className="absolute right-4 top-4 sm:right-6 sm:top-6 cursor-pointer text-gray-400 hover:text-gray-600" onClick={() => router.back()}>
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </div>
 
-      <h2 className="text-2xl font-semibold mb-10 text-black">{isEdit ? 'Edit Mission' : 'Add New Mission'}</h2>
+      <h2 className="text-xl sm:text-2xl font-semibold mb-8 sm:mb-10 text-black">{isEdit ? 'Edit Mission' : 'Add New Mission'}</h2>
       
       {apiError && (
         <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6 border border-red-200">
@@ -534,7 +534,7 @@ const FormTicketMisi: React.FC<FormTicketMisiProps> = ({ isEdit, initialData }) 
         <FormField label="Image" error={errors.foto} required={!isEdit || (existingPhotos.length === 0)}>
           {/* Existing Photos Display */}
           {isEdit && existingPhotos.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               {existingPhotos.map((url, index) => (
                 <div key={index} className="relative aspect-video rounded-lg overflow-hidden group border border-gray-200">
                   <Image
@@ -546,7 +546,7 @@ const FormTicketMisi: React.FC<FormTicketMisiProps> = ({ isEdit, initialData }) 
                   <button
                     type="button"
                     onClick={() => removeExistingPhoto(url)}
-                    className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Hapus foto"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -567,11 +567,11 @@ const FormTicketMisi: React.FC<FormTicketMisiProps> = ({ isEdit, initialData }) 
         </FormField>
       </div>
 
-      <div className="mt-12 flex justify-end">
+      <div className="mt-8 sm:mt-12 flex justify-end">
         <button
           type="submit"
           disabled={isLoading}
-          className="bg-[#2869CA] text-[#EAF0FA] px-16 py-3 rounded-[10px] font-medium hover:bg-blue-700 transition-all disabled:opacity-50"
+          className="w-full sm:w-auto bg-[#2869CA] text-[#EAF0FA] px-10 sm:px-16 py-3 rounded-[10px] font-medium hover:bg-blue-700 transition-all disabled:opacity-50 shadow-md"
         >
           {isLoading ? (isEdit ? 'Updating...' : 'Submitting...') : (isEdit ? 'Update' : 'Submit')}
         </button>

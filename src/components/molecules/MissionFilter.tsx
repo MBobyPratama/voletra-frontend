@@ -35,7 +35,7 @@ const MissionFilter: React.FC<MissionFilterProps> = ({
   return (
     <div className="mb-8">
       {/* Search + Location */}
-      <div className="flex gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <input
           type="text"
           value={search}
@@ -46,7 +46,7 @@ const MissionFilter: React.FC<MissionFilterProps> = ({
         <select
           value={location}
           onChange={(e) => onLocationChange(e.target.value)}
-          className="border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none text-gray-500"
+          className="w-full sm:w-auto border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none text-gray-500"
         >
           <option value="">Your Location</option>
           {LOCATIONS.map((loc) => (

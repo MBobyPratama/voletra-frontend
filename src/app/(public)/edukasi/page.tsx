@@ -15,16 +15,16 @@ export default function EdukasiPage() {
       </section>
 
       {/* Content Card */}
-      <section className="bg-primary-light px-8 py-12">
-        <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm p-10 flex flex-col gap-10">
+      <section className="bg-primary-light px-4 sm:px-8 py-12">
+        <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm p-6 sm:p-10 flex flex-col gap-10">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 text-center sm:text-left">
               Connect for Impact, Anywhere in Indonesia
             </h2>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-gray-600 text-sm sm:text-base leading-relaxed text-justify sm:text-left">
               Platform digital ini menghubungkan relawan dengan berbagai misi
               sosial di seluruh Indonesia, membantu siapa pun untuk
-              berkontribusi dengan mudah melalui peluang yang relevan dan
+              berkontribusi dengan mudah melalui peluang yang relevan and
               berdampak. Melalui jaringan luas organisasi, komunitas, dan
               inisiatif sosial, pengguna dapat menemukan kegiatan relawan,
               program kemanusiaan, hingga aksi tanggap darurat secara real-time
@@ -32,14 +32,14 @@ export default function EdukasiPage() {
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 text-center sm:text-left">
               Empowering Communities Through Meaningful Action
             </h2>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-gray-600 text-sm sm:text-base leading-relaxed text-justify sm:text-left">
               Kami memberdayakan individu dan komunitas untuk terlibat langsung
               dalam aksi sosial yang nyata dan berdampak. Melalui sistem yang
               terintegrasi, relawan dapat menemukan peluang yang sesuai dengan
-              minat, keterampilan, dan lokasi mereka, sementara organisasi dapat
+              minat, keterampilan, and lokasi mereka, sementara organisasi dapat
               menjangkau bantuan yang tepat dengan lebih cepat dan efisien.
               Dengan pendekatan yang kolaboratif dan berbasis kebutuhan,
               platform ini mendorong terciptanya ekosistem sosial yang inklusif,
@@ -50,16 +50,16 @@ export default function EdukasiPage() {
       </section>
 
       {/* A bit more about us */}
-      <section className="bg-primary-light px-8 pb-16">
+      <section className="bg-primary-light px-4 sm:px-8 pb-16">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white grid grid-cols-2 gap-6 p-7 rounded-3xl">
+          <div className="bg-white grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 sm:p-7 rounded-3xl">
             {/* Mission */}
-            <div className="rounded-2xl shadow-sm flex flex-col">
-              <h2 className="bg-white text-2xl p-7 font-bold text-primary-darker">
+            <div className="rounded-2xl shadow-sm flex flex-col sm:col-span-2 lg:col-span-1">
+              <h2 className="bg-white text-xl sm:text-2xl p-4 sm:p-7 font-bold text-primary-darker text-center sm:text-left">
                 A bit more about us...
               </h2>
-              <div className="bg-primary-light p-7 rounded-2xl">
-                <h3 className="text-xl font-bold text-primary-darker mb-3">
+              <div className="bg-primary-light p-5 sm:p-7 rounded-2xl flex-1">
+                <h3 className="text-lg sm:text-xl font-bold text-primary-darker mb-3">
                   Mission
                 </h3>
                 <p className="text-gray-600 leading-relaxed text-sm">
@@ -71,8 +71,8 @@ export default function EdukasiPage() {
             </div>
 
             {/* Vision */}
-            <div className="bg-primary-light rounded-2xl p-7 shadow-sm">
-              <h3 className="text-xl font-bold text-primary-darker mb-3">
+            <div className="bg-primary-light rounded-2xl p-5 sm:p-7 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-bold text-primary-darker mb-3">
                 Vision
               </h3>
               <p className="text-gray-600 leading-relaxed text-sm">
@@ -83,8 +83,8 @@ export default function EdukasiPage() {
             </div>
 
             {/* Our Target */}
-            <div className="bg-primary-light rounded-2xl p-7 shadow-sm">
-              <h3 className="text-xl font-bold text-primary-darker mb-3">
+            <div className="bg-primary-light rounded-2xl p-5 sm:p-7 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-bold text-primary-darker mb-3">
                 Our Target
               </h3>
               <p className="text-gray-600 leading-relaxed text-sm">
@@ -94,8 +94,8 @@ export default function EdukasiPage() {
             </div>
 
             {/* Our Value */}
-            <div className="bg-primary-light rounded-2xl p-7 shadow-sm">
-              <h3 className="text-xl font-bold text-primary-darker mb-3">
+            <div className="bg-primary-light rounded-2xl p-5 sm:p-7 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-bold text-primary-darker mb-3">
                 Our Value
               </h3>
               <p className="text-gray-600 leading-relaxed text-sm">

@@ -19,7 +19,7 @@ export default function Home() {
     <>
       <Hero />
 
-      <section id="mission-section" className="py-16 px-16 bg-white">
+      <section id="mission-section" className="py-16 px-6 sm:px-16 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-primary-normal text-center mb-10">
             Find Your Next Volunteer Opportunity

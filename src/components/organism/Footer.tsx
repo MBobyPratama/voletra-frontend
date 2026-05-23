@@ -4,9 +4,9 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer className="bg-primary-dark text-white">
-      <div className="max-w-7xl mx-auto px-8 lg:px-16 py-14 grid grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] gap-10">
+      <div className="max-w-7xl mx-auto px-6 sm:px-16 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] gap-10">
         {/* Brand */}
-        <div className="col-span-1">
+        <div className="col-span-1 sm:col-span-2 lg:col-span-1">
           <div className="flex items-center gap-2 mb-4">
             <Image
               src="/icons/logo_voletra.png"

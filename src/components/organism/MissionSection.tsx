@@ -170,10 +170,12 @@ export default function MissionSection() {
   // ── Tampilan detail misi full-screen (menggantikan seluruh halaman dashboard) ──
   if (selectedMisi) {
     return (
-      <div className="fixed ml-64 inset-0 z-50 bg-[#EAF0FA] overflow-y-auto">
-        <Sidebar />
+      <div className="fixed lg:ml-64 inset-0 z-50 bg-[#EAF0FA] overflow-y-auto">
+        <div className="hidden lg:block">
+           <Sidebar />
+        </div>
 
-        <div className="p-8">
+        <div className="p-4 sm:p-8">
           <MissionDetailCard
             misi={selectedMisi}
             onBack={() => setSelectedMisi(null)}
@@ -200,7 +202,7 @@ export default function MissionSection() {
       />
 
       {loading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <MissionSkeleton key={i} />
           ))}
@@ -211,7 +213,7 @@ export default function MissionSection() {
           <p className="text-sm mt-1">Coba ubah filter pencarian kamu</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((misi) => (
             <PublicMissionCard
               key={misi.id}
