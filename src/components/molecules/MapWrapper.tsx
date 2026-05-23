@@ -53,8 +53,8 @@ export default function MapWrapper({ height = "500px" }: { height?: string }) {
       setRedirectTo(`/dashboard/relawan/misi/${id}`);
       openModal();
     } else {
-      // If user is a volunteer (relawan), go to their dashboard version of mission detail
-      if (role === 'relawan') {
+      // If user is a volunteer (volunteer/relawan), go to their dashboard version of mission detail
+      if (role === 'volunteer') {
         router.push(`/dashboard/relawan/misi/${id}`);
       } else if (role === 'lembaga') {
         router.push(`/dashboard/pelapor/misi/${id}`);
